@@ -101,4 +101,37 @@ def select_tools():
                 print("Numero fuori intervallo. Riprova.")
         else:
             print("Input non valido. Inserisci un numero tra 1 e 6.")
+    print(selected_tools)
     return selected_tools
+
+def download_fasta():
+    pdb_folder="files_pdb"
+    fasta_folder="files_fasta"
+    if os.path.exists(fasta_folder):
+        print(f"La cartella '{fasta_folder}' esiste già.")
+        return
+    if not(os.path.exists(pdb_folder)):
+        print(f"La cartella '{pdb_folder}' non esiste.")
+        return
+    os.makedirs(fasta_folder, exist_ok=True)
+    url_base_fasta = "https://www.rcsb.org/fasta/entry/"
+    for file in os.listdir(pdb_folder):
+        if file.endswith(".pdb"):
+            codice_pdb = os.path.splitext(file)[0]
+            url_fasta = f"{url_base_fasta}{codice_pdb}"
+            try:
+                response = requests.get(url_fasta, timeout=10)
+                response.raise_for_status()
+                fasta_path = os.path.join(fasta_folder, f"{codice_pdb}.fasta")
+                with open(fasta_path, "w", encoding='utf-8') as f:
+                    f.write(response.text)
+                print(f"Scaricato: {codice_pdb}.fasta")
+            except requests.exceptions.RequestException as e:
+                print(f"Errore nel download di {codice_pdb}: {e}")
+
+#try_run
+
+#get_valid_path()
+#select_tools()
+
+#dev
