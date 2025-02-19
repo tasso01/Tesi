@@ -1,3 +1,4 @@
+import shutil
 import os
 import requests
 
@@ -10,28 +11,63 @@ TOOLS = (
     "MC-Annotate"
 )
 
-def from_file_to_set(file_path):
-    with open(file_path, 'r', encoding='utf-8') as file:
-        contenuto = file.read()
-        pdb_ids_app = contenuto.split(',')
-        pdb_ids = {id.strip() for id in pdb_ids_app}
-    return pdb_ids
-
-def download_cif_from_set(pdb_ids, destination_folder="cif_files"):
-    if not os.path.exists(destination_folder):
-        os.makedirs(destination_folder)
-    base_url = "https://files.rcsb.org/download/"
-    for pdb_id in pdb_ids:
-        url = f"{base_url}{pdb_id}.cif"
-        file_path = os.path.join(destination_folder, f"{pdb_id}.cif")
+def download_cif(source_path):
+    destination_folder = "files_cif"
+    if os.path.exists(destination_folder):
+        print(f"La cartella '{destination_folder}' esiste già.")
+        return
+    os.makedirs(destination_folder, exist_ok=True)
+    with open(source_path, "r", encoding='utf-8') as file:
+        content = file.read().strip()
+    id_pdbs = content.split(",")
+    url_base = "https://files.rcsb.org/download/{}.cif"
+    for pdb_id in id_pdbs:
+        pdb_id = pdb_id.strip()
+        url = url_base.format(pdb_id)
+        file_path = os.path.join(destination_folder, f"{pdb_id}.cif")  
         try:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
-            with open(file_path, 'wb') as file:
-                file.write(response.content)
+            with open(file_path, "wb") as f:
+                f.write(response.content)
             print(f"Scaricato: {pdb_id}.cif")
         except requests.exceptions.RequestException as e:
             print(f"Errore nel download di {pdb_id}: {e}")
+
+def copy_folder(source_path):
+    destination = r"C:\Users\Francesco\Desktop\tesi"    
+    destination_path = os.path.join(destination, "files_cif")
+    if os.path.exists(destination_path):
+        print("Esiste già una cartella con il nome 'files_cif' nella destinazione")
+        return
+    try:
+        shutil.copytree(source_path, destination_path)
+        print(f"Cartella spostata con successo in {destination_path}")
+    except Exception as e:
+        print(f"Errore durante lo spostamento: {e}")
+
+def get_valid_path():
+    while True:
+        path_check = input("Inserisci un percorso valido (cartella o file .txt): ").strip('"')
+        if os.path.isdir(path_check):
+            if all(f.endswith('.cif') for f in os.listdir(path_check)):
+                print("Percorso valido accettato_ " + path_check)
+                copy_folder(path_check)
+                return path_check
+            else:
+                print("Errore: La cartella deve contenere solo file .cif")
+        elif os.path.isfile(path_check) and path_check.lower().endswith(".txt"): 
+            with open(path_check, 'r', encoding='utf-8') as file:
+                content = file.read().strip()
+                if all(part.strip().isalnum() for part in content.split(',')):
+                    print("Percorso valido accettato: " + path_check)
+                    download_cif(path_check)
+                    return path_check
+                else:
+                    print("Errore: Il file .txt deve contenere solo codici alfanumerici separati da virgole")
+        else:
+            print("Errore: Il percorso non è una cartella né un file .txt")
+        print("---------------------------")
 
 def select_tools():
     selected_tools = set()
