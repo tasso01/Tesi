@@ -104,6 +104,30 @@ def select_tools():
     print(selected_tools)
     return selected_tools
 
+def download_pdb():
+    cif_folder="files_cif"
+    pdb_folder="files_pdb"
+    if os.path.exists(pdb_folder):
+        print(f"La cartella '{pdb_folder}' esiste già.")
+        return
+    if not(os.path.exists(cif_folder)):
+        print(f"La cartella '{cif_folder}' non esiste.")
+        return
+    os.makedirs(pdb_folder, exist_ok=True)
+    for filename in os.listdir(cif_folder):
+        if filename.endswith(".cif"):
+            pdb_id = filename.split(".")[0]
+            pdb_url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
+            output_path = os.path.join(pdb_folder, f"{pdb_id}.pdb")
+            try:
+                response = requests.get(pdb_url, timeout=10)
+                response.raise_for_status()
+                with open(output_path, "wb") as file:
+                    file.write(response.content)
+                print(f"Scaricato: {output_path}")
+            except requests.RequestException as e:
+                print(f"Errore nel download di {pdb_id}: {e}")
+
 def download_fasta():
     pdb_folder="files_pdb"
     fasta_folder="files_fasta"
@@ -117,17 +141,17 @@ def download_fasta():
     url_base_fasta = "https://www.rcsb.org/fasta/entry/"
     for file in os.listdir(pdb_folder):
         if file.endswith(".pdb"):
-            codice_pdb = os.path.splitext(file)[0]
-            url_fasta = f"{url_base_fasta}{codice_pdb}"
+            pdb_id = os.path.splitext(file)[0]
+            url_fasta = f"{url_base_fasta}{pdb_id}"
             try:
                 response = requests.get(url_fasta, timeout=10)
                 response.raise_for_status()
-                fasta_path = os.path.join(fasta_folder, f"{codice_pdb}.fasta")
+                fasta_path = os.path.join(fasta_folder, f"{pdb_id}.fasta")
                 with open(fasta_path, "w", encoding='utf-8') as f:
                     f.write(response.text)
-                print(f"Scaricato: {codice_pdb}.fasta")
+                print(f"Scaricato: {pdb_id}.fasta")
             except requests.exceptions.RequestException as e:
-                print(f"Errore nel download di {codice_pdb}: {e}")
+                print(f"Errore nel download di {pdb_id}: {e}")
 
 #try_run
 
