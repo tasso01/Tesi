@@ -8,68 +8,64 @@ def get_valid_path():
         path_check = input("Inserisci un percorso valido (cartella o file .txt): ").strip('"')
         if os.path.isdir(path_check):
             if all(f.endswith('.cif') for f in os.listdir(path_check)):
-                print("Percorso valido accettato_ " + path_check)
                 copy_folder(path_check)
-                return path_check
+                return
             else:
                 print("Errore: La cartella deve contenere solo file .cif")
         elif os.path.isfile(path_check) and path_check.lower().endswith(".txt"): 
             with open(path_check, 'r', encoding='utf-8') as file:
                 content = file.read().strip()
                 if all(part.strip().isalnum() for part in content.split(',')):
-                    print("Percorso valido accettato: " + path_check)
                     download_cif(path_check)
-                    return path_check
+                    return
                 else:
-                    print("Errore: Il file .txt deve contenere solo codici alfanumerici separati da virgole")
+                    print("Errore: Il file .txt deve contenere solo PDB_ID separati da virgole")
         else:
             print("Errore: Il percorso non è una cartella né un file .txt")
-        print("---------------------------")
 
 def copy_folder(source_path):
-    destination = r"C:\Users\Francesco\Desktop\tesi"    
-    destination_path = os.path.join(destination, "files_cif")
+    destination_path = "files_cif"
     if os.path.exists(destination_path):
-        print("Esiste già una cartella con il nome 'files_cif' nella destinazione")
+        print(f"Esiste già una cartella con il nome '{destination_path}' nella destinazione")
         return
     try:
         shutil.copytree(source_path, destination_path)
-        print(f"Cartella spostata con successo in {destination_path}")
     except Exception as e:
         print(f"Errore durante lo spostamento: {e}")
 
 def download_cif(source_path):
-    destination_folder = "files_cif"
-    if os.path.exists(destination_folder):
-        print(f"La cartella '{destination_folder}' esiste già.")
+    destination_path = "files_cif"
+    if os.path.exists(destination_path):
+        print(f"LEsiste già una cartella con il nome '{destination_path}' nella destinazione")
         return
-    os.makedirs(destination_folder, exist_ok=True)
+    os.makedirs(destination_path)
     with open(source_path, "r", encoding='utf-8') as file:
         content = file.read().strip()
     id_pdbs = content.split(",")
-    url_base = "https://files.rcsb.org/download/{}.cif"
+    base_url = "https://files.rcsb.org/download/{}.cif"
     for pdb_id in id_pdbs:
         pdb_id = pdb_id.strip()
-        url = url_base.format(pdb_id)
-        file_path = os.path.join(destination_folder, f"{pdb_id}.cif")  
+        url = base_url.format(pdb_id)
+        file_path = os.path.join(destination_path, f"{pdb_id}.cif")  
         try:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
-            with open(file_path, "wb") as f:
-                f.write(response.content)
-            print(f"Scaricato: {pdb_id}.cif")
+            with open(file_path, "wb") as file:
+                file.write(response.content)
         except requests.exceptions.RequestException as e:
             print(f"Errore nel download di {pdb_id}: {e}")
 
 def insert_family():
     global MOLECULE_FAMILY
     MOLECULE_FAMILY = input("Inserisci il nome della famiglia (o premi invio per continuare): ")
+    print(f"Famiglia selezionata: {MOLECULE_FAMILY}")
 
 def insert_sequence_distance():
     global SEQUENCE_DISTANCE
     valore_input = input("Inserisci la distanza della sequenza (o premi invio per inserire 0): ")
     if valore_input.replace('.', '', 1).isdigit():
         SEQUENCE_DISTANCE = float(valore_input)
+    print(f"Distanza della sequenza impostata a: {SEQUENCE_DISTANCE}")
 
 def select_tools():
     global SELECTED_TOOLS
@@ -83,7 +79,7 @@ def select_tools():
             user_input = input("\nInserisci il numero di un tool da selezionare: ").strip()
         if user_input.lower() == "next":
             if SELECTED_TOOLS:
-                break
+                return
             else:
                 print("Devi selezionare almeno un tool prima di terminare.")
                 continue
@@ -95,10 +91,8 @@ def select_tools():
                     print("Questo tool è già stato selezionato. Scegline un altro.")
                 else:
                     SELECTED_TOOLS.add(selected_tool)
-                    print(f"Aggiunto: {selected_tool}")        
                     if len(SELECTED_TOOLS) == len(TOOLS):
-                        print("Hai selezionato tutti i tool disponibili.")
-                        break
+                        return
             else:
                 print("Numero fuori intervallo. Riprova.")
         else:
@@ -108,23 +102,23 @@ def download_pdb():
     cif_folder="files_cif"
     pdb_folder="files_pdb"
     if os.path.exists(pdb_folder):
-        print(f"La cartella '{pdb_folder}' esiste già.")
+        print(f"La cartella '{pdb_folder}' esiste già")
         return
     if not(os.path.exists(cif_folder)):
-        print(f"La cartella '{cif_folder}' non esiste.")
+        print(f"La cartella '{cif_folder}' non esiste")
         return
-    os.makedirs(pdb_folder, exist_ok=True)
+    os.makedirs(pdb_folder)
+    base_url = "https://files.rcsb.org/download/{}.pdb"
     for filename in os.listdir(cif_folder):
         if filename.endswith(".cif"):
-            pdb_id = filename.split(".")[0]
-            pdb_url = f"https://files.rcsb.org/download/{pdb_id}.pdb"
-            output_path = os.path.join(pdb_folder, f"{pdb_id}.pdb")
+            pdb_id = os.path.splitext(filename)[0]
+            url = base_url.format(pdb_id)
+            file_path = os.path.join(pdb_folder, f"{pdb_id}.pdb")
             try:
-                response = requests.get(pdb_url, timeout=10)
+                response = requests.get(url, timeout=10)
                 response.raise_for_status()
-                with open(output_path, "wb") as file:
+                with open(file_path, "wb") as file:
                     file.write(response.content)
-                print(f"Scaricato: {output_path}")
             except requests.RequestException as e:
                 print(f"Errore nel download di {pdb_id}: {e}")
 
@@ -132,23 +126,22 @@ def download_fasta():
     pdb_folder="files_pdb"
     fasta_folder="files_fasta"
     if os.path.exists(fasta_folder):
-        print(f"La cartella '{fasta_folder}' esiste già.")
+        print(f"La cartella '{fasta_folder}' esiste già")
         return
     if not(os.path.exists(pdb_folder)):
-        print(f"La cartella '{pdb_folder}' non esiste.")
+        print(f"La cartella '{pdb_folder}' non esiste")
         return
-    os.makedirs(fasta_folder, exist_ok=True)
-    url_base_fasta = "https://www.rcsb.org/fasta/entry/"
-    for file in os.listdir(pdb_folder):
-        if file.endswith(".pdb"):
-            pdb_id = os.path.splitext(file)[0]
-            url_fasta = f"{url_base_fasta}{pdb_id}"
+    os.makedirs(fasta_folder)
+    base_url = "https://www.rcsb.org/fasta/entry/"
+    for filename in os.listdir(pdb_folder):
+        if filename.endswith(".pdb"):
+            pdb_id = os.path.splitext(filename)[0]
+            url = f"{base_url}{pdb_id}"
+            file_path = os.path.join(fasta_folder, f"{pdb_id}.fasta")
             try:
-                response = requests.get(url_fasta, timeout=10)
+                response = requests.get(url, timeout=10)
                 response.raise_for_status()
-                fasta_path = os.path.join(fasta_folder, f"{pdb_id}.fasta")
-                with open(fasta_path, "w", encoding='utf-8') as f:
-                    f.write(response.text)
-                print(f"Scaricato: {pdb_id}.fasta")
+                with open(file_path, "w", encoding='utf-8') as file:
+                    file.write(response.text)
             except requests.exceptions.RequestException as e:
                 print(f"Errore nel download di {pdb_id}: {e}")
