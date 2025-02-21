@@ -8,6 +8,7 @@ def get_valid_path():
         path_check = input("Inserisci un percorso valido (cartella o file .txt): ").strip('"')
         if os.path.isdir(path_check):
             if all(f.endswith('.cif') for f in os.listdir(path_check)):
+                print(f"Valid input path: {path_check}")
                 copy_folder(path_check)
                 return
             else:
@@ -16,6 +17,7 @@ def get_valid_path():
             with open(path_check, 'r', encoding='utf-8') as file:
                 content = file.read().strip()
                 if all(part.strip().isalnum() for part in content.split(',')):
+                    print(f"Valid input path: {path_check}")
                     download_cif(path_check)
                     return
                 else:
@@ -30,8 +32,9 @@ def copy_folder(source_path):
         return
     try:
         shutil.copytree(source_path, destination_path)
-    except Exception as e:
-        print(f"Errore durante lo spostamento: {e}")
+        print(f"Cartella copiata nel progetto in {destination_path}")
+    except shutil.Error as e:
+        print(f"Errore durante la copia della cartella: {e}")
 
 def download_cif(source_path):
     destination_path = "files_cif"
@@ -52,6 +55,7 @@ def download_cif(source_path):
             response.raise_for_status()
             with open(file_path, "wb") as file:
                 file.write(response.content)
+            print(f"Scaricato {pdb_id}.cif")
         except requests.exceptions.RequestException as e:
             print(f"Errore nel download di {pdb_id}: {e}")
 
@@ -91,7 +95,9 @@ def select_tools():
                     print("Questo tool è già stato selezionato. Scegline un altro.")
                 else:
                     SELECTED_TOOLS.add(selected_tool)
+                    print(f"Aggiunto: {selected_tool}")
                     if len(SELECTED_TOOLS) == len(TOOLS):
+                        print("Hai selezionato tutti i tool disponibili.")
                         return
             else:
                 print("Numero fuori intervallo. Riprova.")
@@ -119,6 +125,7 @@ def download_pdb():
                 response.raise_for_status()
                 with open(file_path, "wb") as file:
                     file.write(response.content)
+                print(f"Scaricato {pdb_id}.pdb")
             except requests.RequestException as e:
                 print(f"Errore nel download di {pdb_id}: {e}")
 
@@ -143,5 +150,6 @@ def download_fasta():
                 response.raise_for_status()
                 with open(file_path, "w", encoding='utf-8') as file:
                     file.write(response.text)
+                print(f"Scarciato {pdb_id}.fasta")
             except requests.exceptions.RequestException as e:
                 print(f"Errore nel download di {pdb_id}: {e}")
