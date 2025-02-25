@@ -2,7 +2,7 @@ import re
 import shutil
 import os
 import requests
-from src import MOLECULE_FAMILY, TOOLS, SELECTED_TOOLS
+from src import TOOLS, SELECTED_TOOLS, set_molecule_family, get_molecule_family
 
 def get_valid_path():
     while True:
@@ -61,9 +61,9 @@ def download_cif(source_path):
             print(f"Errore nel download di {pdb_id}: {e}")
 
 def insert_family():
-    global MOLECULE_FAMILY
-    MOLECULE_FAMILY = input("Inserisci il nome della famiglia (o premi invio per continuare): ")
-    print(f"Famiglia selezionata: {MOLECULE_FAMILY}")
+    fam = input("Inserisci il nome della famiglia (o premi invio per continuare): ")
+    set_molecule_family(fam)
+    print("Famiglia selezionata: "+get_molecule_family())
 
 def select_tools():
     global SELECTED_TOOLS
