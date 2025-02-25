@@ -1,7 +1,8 @@
+import re
 import shutil
 import os
 import requests
-from src import MOLECULE_FAMILY, SEQUENCE_DISTANCE, TOOLS, SELECTED_TOOLS
+from src import MOLECULE_FAMILY, TOOLS, SELECTED_TOOLS
 
 def get_valid_path():
     while True:
@@ -63,13 +64,6 @@ def insert_family():
     global MOLECULE_FAMILY
     MOLECULE_FAMILY = input("Inserisci il nome della famiglia (o premi invio per continuare): ")
     print(f"Famiglia selezionata: {MOLECULE_FAMILY}")
-
-def insert_sequence_distance():
-    global SEQUENCE_DISTANCE
-    valore_input = input("Inserisci la distanza della sequenza (o premi invio per inserire 0): ")
-    if valore_input.replace('.', '', 1).isdigit():
-        SEQUENCE_DISTANCE = float(valore_input)
-    print(f"Distanza della sequenza impostata a: {SEQUENCE_DISTANCE}")
 
 def select_tools():
     global SELECTED_TOOLS
@@ -153,3 +147,22 @@ def download_fasta():
                 print(f"Scarciato {pdb_id}.fasta")
             except requests.exceptions.RequestException as e:
                 print(f"Errore nel download di {pdb_id}: {e}")
+
+def filter_fasta_by_chain_id(chain_ids, fasta_file, output_file):
+    with open(fasta_file, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    selected_lines = []
+    save_sequence = False   
+    for line in lines:
+        if line.startswith('>'):
+            match = re.search(r'Chain ([A-Za-z0-9]+)', line)
+            if match:
+                chain_id = match.group(1)
+                save_sequence = chain_id in chain_ids
+            else:
+                save_sequence = False       
+        if save_sequence:
+            selected_lines.append(line)    
+    with open(output_file, 'w', encoding='utf-8') as out_f:
+        out_f.writelines(selected_lines)
+    print(f"File filtrato salvato in: {output_file}")
