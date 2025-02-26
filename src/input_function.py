@@ -2,7 +2,7 @@ import re
 import shutil
 import os
 import requests
-from src import TOOLS, SELECTED_TOOLS, set_molecule_family, get_molecule_family
+from src import set_molecule_family, get_molecule_family, add_tool, get_selected_tools, get_tools
 
 def get_valid_path():
     while True:
@@ -66,37 +66,38 @@ def insert_family():
     print("Famiglia selezionata: "+get_molecule_family())
 
 def select_tools():
-    global SELECTED_TOOLS
-    while len(SELECTED_TOOLS) < len(TOOLS):
+    while len(get_selected_tools()) < len(get_tools()):
         print("\nLista dei tool disponibili:")
-        for index, tool in enumerate(TOOLS, start=1):
+        for index, tool in enumerate(get_tools(), start=1):
             print(f"{index}. {tool}")
-        if SELECTED_TOOLS:
+        if get_selected_tools():
             user_input = input("\nInserisci il numero di un tool da selezionare (o 'next' per terminare): ").strip()
         else:
             user_input = input("\nInserisci il numero di un tool da selezionare: ").strip()
         if user_input.lower() == "next":
-            if SELECTED_TOOLS:
+            if get_selected_tools():
                 return
             else:
                 print("Devi selezionare almeno un tool prima di terminare.")
                 continue
         if user_input.isdigit():
             tool_index = int(user_input)
-            if 1 <= tool_index <= len(TOOLS):
-                selected_tool = TOOLS[tool_index - 1]
-                if selected_tool in SELECTED_TOOLS:
+            if 1 <= tool_index <= len(get_tools()):
+                selected_tool = get_tools()[tool_index - 1]
+                if selected_tool in get_selected_tools():
                     print("Questo tool è già stato selezionato. Scegline un altro.")
                 else:
-                    SELECTED_TOOLS.add(selected_tool)
+                    add_tool(selected_tool)
                     print(f"Aggiunto: {selected_tool}")
-                    if len(SELECTED_TOOLS) == len(TOOLS):
+                    if len(get_selected_tools()) == len(get_tools()):
                         print("Hai selezionato tutti i tool disponibili.")
                         return
             else:
                 print("Numero fuori intervallo. Riprova.")
         else:
             print("Input non valido. Inserisci un numero tra 1 e 6.")
+
+#OLD
 
 def download_pdb():
     cif_folder="files_cif"
