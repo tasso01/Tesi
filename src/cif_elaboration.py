@@ -44,29 +44,43 @@ def extract_atoms_from_entity_id(file_cif, molecule_id):
     print(f"✅ Dati completi degli ATOM per entity_id {molecule_id} salvati in '{output_file}'.")
 
 def process_all_cif_files():
-    """
-    Applica la funzione extract_atoms_from_family a ogni file .cif presente nella cartella 'files_cif'.
-    """
     cif_directory = "files_cif"  # Cartella fissa
-
     if not os.path.exists(cif_directory):
         raise FileNotFoundError(f"La cartella '{cif_directory}' non esiste.")
-
     cif_files = [f for f in os.listdir(cif_directory) if f.endswith(".cif")]
-    
     if not cif_files:
         print("⚠️ Nessun file .cif trovato nella cartella.")
         return
-    
     for cif_file in cif_files:
         cif_path = os.path.join(cif_directory, cif_file)
         molecule_family = get_molecule_family()  # Ottieni la famiglia della molecola dal file
-
         if not molecule_family:
             print(f"⚠️ Nessuna famiglia di molecole trovata per {cif_file}.")
             continue
-
         print(f"🔍 Elaborazione file: {cif_file} con molecola '{molecule_family}'...")
         extract_atoms_from_family(cif_path, molecule_family)
-    
     print("✅ Elaborazione completata per tutti i file .cif.")
+
+def extract_atoms_to_cif(file_cif, molecule_id):
+    cif_dict = MMCIF2Dict(file_cif)
+    required_keys = ["_atom_site.group_PDB", "_atom_site.label_entity_id"]
+    for key in required_keys:
+        if key not in cif_dict:
+            raise KeyError(f"Il file CIF non contiene la categoria {key}.")
+    group_pdb = cif_dict["_atom_site.group_PDB"]
+    entity_ids = cif_dict["_atom_site.label_entity_id"]
+    atom_indices = [i for i, (g, eid) in enumerate(zip(group_pdb, entity_ids)) if g == "ATOM" and eid == str(molecule_id)]
+    if not atom_indices:
+        print(f"⚠️ Nessun ATOM trovato per entity_id {molecule_id} nel file CIF.")
+        return
+    output_directory = "files_cif_id"
+    os.makedirs(output_directory, exist_ok=True)
+    pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
+    output_file = os.path.join(output_directory, f"{pdb_id}_{molecule_id}.cif")
+    with open(output_file, mode="w", encoding='utf-8') as file:
+        for line in open(file_cif, encoding='utf-8'):
+            if line.startswith("_atom_site."):
+                file.write(line)
+            elif line.split()[0] == "ATOM" and line.split()[1] in [str(i+1) for i in atom_indices]:
+                file.write(line)
+    print(f"✅ Dati completi degli ATOM per entity_id {molecule_id} salvati in '{output_file}'.")
