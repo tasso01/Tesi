@@ -1,5 +1,6 @@
 import csv
 import os
+import shutil
 import subprocess
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from src import get_molecule_family
@@ -86,13 +87,26 @@ def process_all_cif_files():
         extract_atoms_from_family(cif_path, molecule_family)
     print("Elaborazione completata per tutti i file .cif.")
 
+def move_pdb_files():
+    src_directory = os.path.dirname(os.path.abspath(__file__))  # Percorso della cartella src
+    project_root = os.path.abspath(os.path.join(src_directory, os.pardir))  # Percorso della cartella principale
+    pdb_folder = os.path.join(project_root, 'files_pdb_id')
+    if not os.path.exists(pdb_folder):
+        os.makedirs(pdb_folder)
+    for file in os.listdir(project_root):
+        if file.endswith(".pdb"):
+            src_path = os.path.join(project_root, file)
+            dst_path = os.path.join(pdb_folder, file)
+            shutil.move(src_path, dst_path)
+            print(f"Spostato: {file} -> {pdb_folder}")
+
 def cif_pdb_converter():
     beem_executable_path = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"  
     cif_folder = "files_cif_id" 
     cif_files = [f for f in os.listdir(cif_folder) if f.endswith(".cif")]
-
     for cif_file in cif_files:
         file_name_without_ext = os.path.splitext(cif_file)[0]
         command = f'"{beem_executable_path}" -p={file_name_without_ext} {cif_folder}\\{cif_file}'
         print(f"Eseguendo: {command}")
         subprocess.run(command, shell=True, check=True)
+    move_pdb_files()
