@@ -1,5 +1,6 @@
 import csv
 import os
+import subprocess
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from src import get_molecule_family
 
@@ -81,6 +82,17 @@ def process_all_cif_files():
         if not molecule_family:
             print(f"Nessuna famiglia di molecole trovata in {cif_file}.")
             continue
-        print(f"🔍 Elaborazione file: {cif_file} con molecola '{molecule_family}'...")
+        print(f"Elaborazione file: {cif_file} con molecola '{molecule_family}'...")
         extract_atoms_from_family(cif_path, molecule_family)
     print("Elaborazione completata per tutti i file .cif.")
+
+def cif_pdb_converter():
+    beem_executable_path = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"  
+    cif_folder = "files_cif_id" 
+    cif_files = [f for f in os.listdir(cif_folder) if f.endswith(".cif")]
+
+    for cif_file in cif_files:
+        file_name_without_ext = os.path.splitext(cif_file)[0]
+        command = f'"{beem_executable_path}" -p={file_name_without_ext} {cif_folder}\\{cif_file}'
+        print(f"Eseguendo: {command}")
+        subprocess.run(command, shell=True, check=True)
