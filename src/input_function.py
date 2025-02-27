@@ -2,14 +2,15 @@ import re
 import shutil
 import os
 import requests
-from src import set_molecule_family, get_molecule_family, add_tool, get_selected_tools, get_tools
+from src import set_molecule_family, add_tool, get_selected_tools, get_tools
 
 def get_valid_path():
     while True:
+        print("--------------------------------------------------")
         path_check = input("Inserisci un percorso valido (cartella o file .txt): ").strip('"')
         if os.path.isdir(path_check):
             if all(f.endswith('.cif') for f in os.listdir(path_check)):
-                print(f"Valid input path: {path_check}")
+                print("--------------------------------------------------")
                 copy_folder(path_check)
                 return
             else:
@@ -18,7 +19,7 @@ def get_valid_path():
             with open(path_check, 'r', encoding='utf-8') as file:
                 content = file.read().strip()
                 if all(part.strip().isalnum() for part in content.split(',')):
-                    print(f"Valid input path: {path_check}")
+                    print("--------------------------------------------------")
                     download_cif(path_check)
                     return
                 else:
@@ -29,18 +30,19 @@ def get_valid_path():
 def copy_folder(source_path):
     destination_path = "files_cif"
     if os.path.exists(destination_path):
-        print(f"Esiste già una cartella con il nome '{destination_path}' nella destinazione")
+        print(f"Esiste già una cartella con il nome '{destination_path}'")
         return
     try:
         shutil.copytree(source_path, destination_path)
-        print(f"Cartella copiata nel progetto in {destination_path}")
+        print(f"Cartella '{destination_path}' contenente i file mmCIF importata")
+        print("--------------------------------------------------")
     except shutil.Error as e:
         print(f"Errore durante la copia della cartella: {e}")
 
 def download_cif(source_path):
     destination_path = "files_cif"
     if os.path.exists(destination_path):
-        print(f"LEsiste già una cartella con il nome '{destination_path}' nella destinazione")
+        print(f"Esiste già una cartella con il nome '{destination_path}'")
         return
     os.makedirs(destination_path)
     with open(source_path, "r", encoding='utf-8') as file:
@@ -59,43 +61,46 @@ def download_cif(source_path):
             print(f"Scaricato {pdb_id}.cif")
         except requests.exceptions.RequestException as e:
             print(f"Errore nel download di {pdb_id}: {e}")
+    print(f"Cartella '{destination_path}' contenente i file mmCIF creata")
+    print("--------------------------------------------------")
 
 def insert_family():
     fam = input("Inserisci il nome della famiglia (o premi invio per continuare): ")
     set_molecule_family(fam)
-    print("Famiglia selezionata: "+get_molecule_family())
+    print("--------------------------------------------------")
 
 def select_tools():
     while len(get_selected_tools()) < len(get_tools()):
-        print("\nLista dei tool disponibili:")
+        print("Lista dei tool disponibili:")
         for index, tool in enumerate(get_tools(), start=1):
             print(f"{index}. {tool}")
         if get_selected_tools():
-            user_input = input("\nInserisci il numero di un tool da selezionare (o 'next' per terminare): ").strip()
+            user_input = input("Inserisci il numero di un tool da selezionare (o 'next' per terminare): ").strip()
         else:
-            user_input = input("\nInserisci il numero di un tool da selezionare: ").strip()
+            user_input = input("Inserisci il numero di un tool da selezionare: ").strip()
         if user_input.lower() == "next":
             if get_selected_tools():
+                print("--------------------------------------------------")
                 return
             else:
-                print("Devi selezionare almeno un tool prima di terminare.")
+                print("Devi selezionare almeno un tool prima di terminare")
                 continue
         if user_input.isdigit():
             tool_index = int(user_input)
             if 1 <= tool_index <= len(get_tools()):
                 selected_tool = get_tools()[tool_index - 1]
                 if selected_tool in get_selected_tools():
-                    print("Questo tool è già stato selezionato. Scegline un altro.")
+                    print("Questo tool è già stato selezionato, scegline un altro")
                 else:
                     add_tool(selected_tool)
                     print(f"Aggiunto: {selected_tool}")
                     if len(get_selected_tools()) == len(get_tools()):
-                        print("Hai selezionato tutti i tool disponibili.")
+                        print("--------------------------------------------------")
                         return
             else:
-                print("Numero fuori intervallo. Riprova.")
+                print("Numero fuori intervallo, riprova")
         else:
-            print("Input non valido. Inserisci un numero tra 1 e 6.")
+            print("Input non valido, inserisci un numero tra 1 e 6")
 
 #OLD
 

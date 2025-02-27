@@ -15,7 +15,7 @@ def extract_atoms_to_cif(file_cif, molecule_id):
     entity_ids = cif_dict["_atom_site.label_entity_id"]
     atom_indices = [i for i, (g, eid) in enumerate(zip(group_pdb, entity_ids)) if g == "ATOM" and eid == str(molecule_id)]
     if not atom_indices:
-        print(f"Nessun ATOM trovato per entity_id {molecule_id} nel file {file_cif}")
+        print(f"Nessun ATOM trovato per entity_id '{molecule_id}' nel file '{file_cif}'")
         return
     output_directory = "files_cif_id"
     os.makedirs(output_directory, exist_ok=True)
@@ -69,6 +69,38 @@ def extract_atoms_from_family(file_cif, molecule):
     molecule_id = entity_map.get(molecule, -1)
     extract_atoms_to_cif(file_cif, molecule_id)
 
+def extract_all_atoms_to_cif(input_cif):
+    with open(input_cif, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    atom_site_section = False
+    headers = []
+    atom_lines = []
+    for line in lines:
+        if line.strip().startswith('loop_'):
+            atom_site_section = True
+            headers = []
+            continue
+        if atom_site_section:
+            if line.strip().startswith('_atom_site.'):
+                headers.append(line.strip())
+            else:
+                if headers and line.strip():
+                    columns = line.split()
+                    if 'ATOM' in columns:
+                        atom_lines.append(line.strip())
+                else:
+                    atom_site_section = False
+    output_directory = "files_cif_id"
+    os.makedirs(output_directory, exist_ok=True)
+    pdb_id = os.path.splitext(os.path.basename(input_cif))[0]
+    output_file = os.path.join(output_directory, f"{pdb_id}_0.cif")
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for header in headers:
+            f.write(f"{header}\n")
+        for atom in atom_lines:
+            f.write(f"{atom}\n")
+    print(f"File {output_file} creato con successo.")
+
 def process_all_cif_files():
     cif_directory = "files_cif"
     if not os.path.exists(cif_directory):
@@ -77,15 +109,17 @@ def process_all_cif_files():
     if not cif_files:
         print("Nessun file .cif trovato nella cartella")
         return
-    for cif_file in cif_files:
-        cif_path = os.path.join(cif_directory, cif_file)
-        molecule_family = get_molecule_family()
-        if not molecule_family:
-            print(f"Nessuna famiglia di molecole trovata in {cif_file}.")
-            continue
-        print(f"Elaborazione file: {cif_file} con molecola '{molecule_family}'...")
-        extract_atoms_from_family(cif_path, molecule_family)
-    print("Elaborazione completata per tutti i file .cif.")
+    molecule_family = get_molecule_family()
+    if not molecule_family:
+        for cif_file in cif_files:
+            cif_path = os.path.join(cif_directory, cif_file)
+            extract_all_atoms_to_cif(cif_path)
+    else:
+        for cif_file in cif_files:
+            cif_path = os.path.join(cif_directory, cif_file)
+            extract_atoms_from_family(cif_path, molecule_family)
+    print(f"Molecole estratte da tutti i file mmCIF nella cartella {cif_directory}")
+    print("--------------------------------------------------")
 
 def move_pdb_files():
     src_directory = os.path.dirname(os.path.abspath(__file__))  # Percorso della cartella src
@@ -98,15 +132,18 @@ def move_pdb_files():
             src_path = os.path.join(project_root, file)
             dst_path = os.path.join(pdb_folder, file)
             shutil.move(src_path, dst_path)
-            print(f"Spostato: {file} -> {pdb_folder}")
+    print("Convertiti tutti i files mmCIF presenti nella cartella 'files_pdb_id' in PDB")
+    print("--------------------------------------------------")
 
 def cif_pdb_converter():
-    beem_executable_path = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"  
-    cif_folder = "files_cif_id" 
+    beem_executable_path = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"
+    cif_folder = "files_cif_id"
+    if not os.path.exists(cif_folder):
+        raise FileNotFoundError(f"La cartella {cif_folder} non esiste.")
     cif_files = [f for f in os.listdir(cif_folder) if f.endswith(".cif")]
     for cif_file in cif_files:
         file_name_without_ext = os.path.splitext(cif_file)[0]
         command = f'"{beem_executable_path}" -p={file_name_without_ext} {cif_folder}\\{cif_file}'
-        print(f"Eseguendo: {command}")
+        print(f"Conversione {cif_file} to PDB")
         subprocess.run(command, shell=True, check=True)
     move_pdb_files()
