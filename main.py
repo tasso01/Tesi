@@ -3,15 +3,15 @@ from src import input_function, cif_elaboration
 
 def main():
     parser = argparse.ArgumentParser(description="Line Command Args")
-    parser.add_argument("percorso_file_system", type=str, help="Percorso del file system")
+    parser.add_argument("file_system_path", type=str, help="Percorso del file system")
     group = parser.add_mutually_exclusive_group(required=True)
-    group.add_argument("-f", "--famiglia", type=str, help="Tipo di molecola")
+    group.add_argument("-m", "--molecola", type=str, help="Tipo di molecola")
     group.add_argument("-p", "--polimero", type=str, help="Tipo di polimero")
     parser.add_argument("-t", "--tool", type=str, required=True, help="Nome del tool")
     args = parser.parse_args()
-    input_function.insert_path(args.percorso_file_system)
-    if args.famiglia:
-        input_function.insert_family(args.famiglia)
+    input_function.insert_path(args.file_system_path)
+    if args.molecola:
+        input_function.insert_family(args.molecola)
     if args.polimero:
         input_function.insert_polymer(args.polimero)
     input_function.insert_tool(args.tool)
