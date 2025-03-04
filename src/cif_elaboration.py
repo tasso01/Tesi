@@ -31,7 +31,7 @@ def extract_atoms_from_ids(file_cif, entity_ids):
             for line in lines:
                 if line.startswith("_atom_site.") or (line.startswith("ATOM") and int(line.split()[1]) in indices):
                     outfile.write(line)
-        print(f"ATOM per entity_id {entity_id} salvati in {output_file}")
+        print(f"ATOM di {pdb_id} per entity_id {entity_id} salvati in {output_file}")
 
 def extract_ids_from_molecule(mmcif_file, molecule):
     entity_ids = set()
