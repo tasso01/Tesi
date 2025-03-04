@@ -16,6 +16,7 @@ def main():
         input_function.insert_polymer(args.polimero)
     input_function.insert_tool(args.tool)
     cif_elaboration.process_all_cif_files()
+    cif_elaboration.cif_pdb_converter()
 
-if __name__ == "__main__":
+if __name__ == "__main__":    
     main()
