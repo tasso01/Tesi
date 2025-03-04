@@ -3,7 +3,7 @@ import os
 import shutil
 import subprocess
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
-from src import get_molecule_family
+from src import get_molecule_type
 
 def extract_atoms_to_cif(file_cif, molecule_id):
     cif_dict = MMCIF2Dict(file_cif)
@@ -29,31 +29,6 @@ def extract_atoms_to_cif(file_cif, molecule_id):
                 file.write(line)
     print(f"Dati completi degli ATOM per entity_id {molecule_id} salvati in {output_file}")
 
-def extract_atoms_to_csv(file_cif, molecule_id):
-    cif_dict = MMCIF2Dict(file_cif)
-    required_keys = ["_atom_site.group_PDB", "_atom_site.label_entity_id"]
-    for key in required_keys:
-        if key not in cif_dict:
-            raise KeyError(f"Il file {file_cif} non contiene la categoria {key}.")
-    group_pdb = cif_dict["_atom_site.group_PDB"]
-    entity_ids = cif_dict["_atom_site.label_entity_id"]
-    atom_indices = [i for i, (g, eid) in enumerate(zip(group_pdb, entity_ids)) if g == "ATOM" and eid == str(molecule_id)]
-    if not atom_indices:
-        print(f"Nessun ATOM trovato per entity_id {molecule_id} nel file {file_cif}")
-        return
-    atom_data = {key: [cif_dict[key][i] for i in atom_indices] for key in cif_dict if key.startswith("_atom_site.")}
-    column_names = list(atom_data.keys())
-    output_directory = "files_csv"
-    os.makedirs(output_directory, exist_ok=True)
-    pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
-    output_file = os.path.join(output_directory, f"{pdb_id}.csv")
-    with open(output_file, mode="w", newline="", encoding='utf-8') as file:
-        writer = csv.writer(file)
-        writer.writerow(column_names)        
-        rows = zip(*[atom_data[col] for col in column_names])
-        writer.writerows(rows)
-    print(f"Dati completi degli ATOM per entity_id {molecule_id} salvati in {output_file}")
-
 def extract_atoms_from_family(file_cif, molecule):
     cif_dict = MMCIF2Dict(file_cif)
     entity_ids = cif_dict.get("_entity.id", [])
@@ -69,38 +44,6 @@ def extract_atoms_from_family(file_cif, molecule):
     molecule_id = entity_map.get(molecule, -1)
     extract_atoms_to_cif(file_cif, molecule_id)
 
-def extract_all_atoms_to_cif(input_cif):
-    with open(input_cif, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
-    atom_site_section = False
-    headers = []
-    atom_lines = []
-    for line in lines:
-        if line.strip().startswith('loop_'):
-            atom_site_section = True
-            headers = []
-            continue
-        if atom_site_section:
-            if line.strip().startswith('_atom_site.'):
-                headers.append(line.strip())
-            else:
-                if headers and line.strip():
-                    columns = line.split()
-                    if 'ATOM' in columns:
-                        atom_lines.append(line.strip())
-                else:
-                    atom_site_section = False
-    output_directory = "files_cif_id"
-    os.makedirs(output_directory, exist_ok=True)
-    pdb_id = os.path.splitext(os.path.basename(input_cif))[0]
-    output_file = os.path.join(output_directory, f"{pdb_id}_0.cif")
-    with open(output_file, 'w', encoding='utf-8') as f:
-        for header in headers:
-            f.write(f"{header}\n")
-        for atom in atom_lines:
-            f.write(f"{atom}\n")
-    print(f"File {output_file} creato con successo.")
-
 def process_all_cif_files():
     cif_directory = "files_cif"
     if not os.path.exists(cif_directory):
@@ -109,7 +52,7 @@ def process_all_cif_files():
     if not cif_files:
         print("Nessun file .cif trovato nella cartella")
         return
-    molecule_family = get_molecule_family()
+    molecule_family = get_molecule_type()
     if not molecule_family:
         for cif_file in cif_files:
             cif_path = os.path.join(cif_directory, cif_file)
@@ -147,3 +90,63 @@ def cif_pdb_converter():
         print(f"Conversione {cif_file} to PDB")
         subprocess.run(command, shell=True, check=True)
     move_pdb_files()
+
+#OBS
+
+def extract_atoms_to_csv(file_cif, molecule_id):
+    cif_dict = MMCIF2Dict(file_cif)
+    required_keys = ["_atom_site.group_PDB", "_atom_site.label_entity_id"]
+    for key in required_keys:
+        if key not in cif_dict:
+            raise KeyError(f"Il file {file_cif} non contiene la categoria {key}.")
+    group_pdb = cif_dict["_atom_site.group_PDB"]
+    entity_ids = cif_dict["_atom_site.label_entity_id"]
+    atom_indices = [i for i, (g, eid) in enumerate(zip(group_pdb, entity_ids)) if g == "ATOM" and eid == str(molecule_id)]
+    if not atom_indices:
+        print(f"Nessun ATOM trovato per entity_id {molecule_id} nel file {file_cif}")
+        return
+    atom_data = {key: [cif_dict[key][i] for i in atom_indices] for key in cif_dict if key.startswith("_atom_site.")}
+    column_names = list(atom_data.keys())
+    output_directory = "files_csv"
+    os.makedirs(output_directory, exist_ok=True)
+    pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
+    output_file = os.path.join(output_directory, f"{pdb_id}.csv")
+    with open(output_file, mode="w", newline="", encoding='utf-8') as file:
+        writer = csv.writer(file)
+        writer.writerow(column_names)        
+        rows = zip(*[atom_data[col] for col in column_names])
+        writer.writerows(rows)
+    print(f"Dati completi degli ATOM per entity_id {molecule_id} salvati in {output_file}")
+
+def extract_all_atoms_to_cif(input_cif):
+    with open(input_cif, 'r', encoding='utf-8') as f:
+        lines = f.readlines()
+    atom_site_section = False
+    headers = []
+    atom_lines = []
+    for line in lines:
+        if line.strip().startswith('loop_'):
+            atom_site_section = True
+            headers = []
+            continue
+        if atom_site_section:
+            if line.strip().startswith('_atom_site.'):
+                headers.append(line.strip())
+            else:
+                if headers and line.strip():
+                    columns = line.split()
+                    if 'ATOM' in columns:
+                        atom_lines.append(line.strip())
+                else:
+                    atom_site_section = False
+    output_directory = "files_cif_id"
+    os.makedirs(output_directory, exist_ok=True)
+    pdb_id = os.path.splitext(os.path.basename(input_cif))[0]
+    output_file = os.path.join(output_directory, f"{pdb_id}_0.cif")
+    with open(output_file, 'w', encoding='utf-8') as f:
+        for header in headers:
+            f.write(f"{header}\n")
+        for atom in atom_lines:
+            f.write(f"{atom}\n")
+    print(f"File {output_file} creato con successo.")
+

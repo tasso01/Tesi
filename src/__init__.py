@@ -1,29 +1,26 @@
-MOLECULE_FAMILY = ""
+MOLECULE_TYPE = ""
 
-TOOLS = (
-    "RNApolis Annotator",
-    "FR3D",
-    "bpnet",
-    "baRNAba",
-    "RNAView",
-    "MC-Annotate"
-)
+POLYMER_TYPE = ""
 
-SELECTED_TOOLS = set()
+TOOL = ""
 
-def set_molecule_family(family):
-    global MOLECULE_FAMILY
-    MOLECULE_FAMILY = family
+def set_molecule_type(family):
+    global MOLECULE_TYPE
+    MOLECULE_TYPE = family
 
-def get_molecule_family():
-    return MOLECULE_FAMILY
+def get_molecule_type():
+    return MOLECULE_TYPE
 
-def add_tool(tool):
-    global SELECTED_TOOLS
-    SELECTED_TOOLS.add(tool)
+def set_polymer_type(polymer):
+    global POLYMER_TYPE
+    POLYMER_TYPE = polymer
 
-def get_selected_tools():
-    return SELECTED_TOOLS
+def get_polymer_type():
+    return POLYMER_TYPE
 
-def get_tools():
-    return TOOLS
+def set_tool(tool):
+    global TOOL
+    TOOL = tool
+
+def get_tool():
+    return TOOL
