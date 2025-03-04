@@ -5,33 +5,33 @@ import subprocess
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from src import get_molecule_type, get_polymer_type
 
-def extract_atoms_from_ids(file_cif, molecule_ids):
+def extract_atoms_from_ids(file_cif, entity_ids):
     cif_dict = MMCIF2Dict(file_cif)
-    required_keys = ["_atom_site.group_PDB", "_atom_site.label_entity_id"]  
-    for key in required_keys:
+    for key in ["_atom_site.group_PDB", "_atom_site.label_entity_id"]:
         if key not in cif_dict:
             raise KeyError(f"Il file CIF non contiene la categoria {key}.")
     group_pdb = cif_dict["_atom_site.group_PDB"]
-    entity_ids = cif_dict["_atom_site.label_entity_id"] 
-    atom_indices = {molecule_id: [] for molecule_id in molecule_ids}
-    for i, (g, eid) in enumerate(zip(group_pdb, entity_ids)):
-        if g == "ATOM" and int(eid) in molecule_ids:
-            atom_indices[int(eid)].append(i)
+    label_entity_ids = list(map(int, cif_dict["_atom_site.label_entity_id"]))
+    entity_ids = set(entity_ids)
+    atom_indices = {eid: [] for eid in entity_ids}
+    for i, (g, eid) in enumerate(zip(group_pdb, label_entity_ids)):
+        if g == "ATOM" and eid in entity_ids:
+            atom_indices[eid].append(i + 1)
     output_directory = "files_cif_id"
     os.makedirs(output_directory, exist_ok=True)
     pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
-    for molecule_id, indices in atom_indices.items():
+    with open(file_cif, encoding='utf-8') as infile:
+        lines = infile.readlines()
+    for entity_id, indices in atom_indices.items():
         if not indices:
-            print(f"Nessun ATOM trovato per entity_id '{molecule_id}' nel file '{file_cif}'")
+            print(f"Nessun ATOM trovato per entity_id '{entity_id}' in '{file_cif}'")
             continue
-        output_file = os.path.join(output_directory, f"{pdb_id}_{molecule_id}.cif")
-        with open(output_file, mode="w", encoding='utf-8') as file:
-            for line in open(file_cif, encoding='utf-8'):
-                if line.startswith("_atom_site."):
-                    file.write(line)
-                elif line.split()[0] == "ATOM" and line.split()[1] in [str(i+1) for i in indices]:
-                    file.write(line)
-        print(f"Dati completi degli ATOM per entity_id {molecule_id} salvati in {output_file}")
+        output_file = os.path.join(output_directory, f"{pdb_id}_{entity_id}.cif")
+        with open(output_file, "w", encoding='utf-8') as outfile:
+            for line in lines:
+                if line.startswith("_atom_site.") or (line.startswith("ATOM") and int(line.split()[1]) in indices):
+                    outfile.write(line)
+        print(f"ATOM per entity_id {entity_id} salvati in {output_file}")
 
 def extract_ids_from_molecule(mmcif_file, molecule):
     entity_ids = set()
@@ -79,12 +79,12 @@ def process_all_cif_files():
             extract_ids_from_molecule(cif_path, molecule_type)
     else:
         raise TypeError("Polimero o Molecola mancante")
-    print(f"Molecole estratte da tutti i file mmCIF nella cartella {cif_directory}")
+    print(f"Molecole estratte da tutti i file mmCIF presenti nella cartella {cif_directory}")
     print("--------------------------------------------------")
 
 def move_pdb_files():
-    src_directory = os.path.dirname(os.path.abspath(__file__))  # Percorso della cartella src
-    project_root = os.path.abspath(os.path.join(src_directory, os.pardir))  # Percorso della cartella principale
+    src_directory = os.path.dirname(os.path.abspath(__file__))
+    project_root = os.path.abspath(os.path.join(src_directory, os.pardir))
     pdb_folder = os.path.join(project_root, 'files_pdb_id')
     if not os.path.exists(pdb_folder):
         os.makedirs(pdb_folder)
@@ -131,7 +131,7 @@ def extract_atoms_to_csv(file_cif, molecule_id):
     output_file = os.path.join(output_directory, f"{pdb_id}.csv")
     with open(output_file, mode="w", newline="", encoding='utf-8') as file:
         writer = csv.writer(file)
-        writer.writerow(column_names)        
+        writer.writerow(column_names)
         rows = zip(*[atom_data[col] for col in column_names])
         writer.writerows(rows)
     print(f"Dati completi degli ATOM per entity_id {molecule_id} salvati in {output_file}")
@@ -206,3 +206,31 @@ def extract_atoms_from_id(file_cif, molecule_id):
             elif line.split()[0] == "ATOM" and line.split()[1] in [str(i+1) for i in atom_indices]:
                 file.write(line)
     print(f"Dati completi degli ATOM per entity_id {molecule_id} salvati in {output_file}")
+
+def extract_atoms_from_ids2(file_cif, entity_ids):
+    cif_dict = MMCIF2Dict(file_cif)
+    required_keys = ["_atom_site.group_PDB", "_atom_site.label_entity_id"]
+    for key in required_keys:
+        if key not in cif_dict:
+            raise KeyError(f"Il file CIF non contiene la categoria {key}.")
+    group_pdb = cif_dict["_atom_site.group_PDB"]
+    label_entity_ids = cif_dict["_atom_site.label_entity_id"]
+    atom_indices = {entity_id: [] for entity_id in entity_ids}
+    for i, (g, eid) in enumerate(zip(group_pdb, label_entity_ids)):
+        if g == "ATOM" and int(eid) in entity_ids:
+            atom_indices[int(eid)].append(i)
+    output_directory = "files_cif_id"
+    os.makedirs(output_directory, exist_ok=True)
+    pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
+    for entity_id, indices in atom_indices.items():
+        if not indices:
+            print(f"Nessun ATOM trovato per entity_id '{entity_id}' nel file '{file_cif}'")
+            continue
+        output_file = os.path.join(output_directory, f"{pdb_id}_{entity_id}.cif")
+        with open(output_file, mode="w", encoding='utf-8') as file:
+            for line in open(file_cif, encoding='utf-8'):
+                if line.startswith("_atom_site."):
+                    file.write(line)
+                elif line.split()[0] == "ATOM" and line.split()[1] in [str(i+1) for i in indices]:
+                    file.write(line)
+        print(f"Dati completi degli ATOM per entity_id {entity_id} salvati in {output_file}")

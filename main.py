@@ -2,7 +2,7 @@ import argparse
 from src import input_function, cif_elaboration
 
 def main():
-    parser = argparse.ArgumentParser(description="Gestisce gli argomenti da linea di comando per il programma.")
+    parser = argparse.ArgumentParser(description="Line Command Args")
     parser.add_argument("percorso_file_system", type=str, help="Percorso del file system")
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("-f", "--famiglia", type=str, help="Tipo di molecola")
@@ -18,5 +18,5 @@ def main():
     cif_elaboration.process_all_cif_files()
     cif_elaboration.cif_pdb_converter()
 
-if __name__ == "__main__":    
+if __name__ == "__main__":
     main()

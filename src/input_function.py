@@ -44,7 +44,7 @@ def download_cif(source_path):
     for pdb_id in id_pdbs:
         pdb_id = pdb_id.strip()
         url = base_url.format(pdb_id)
-        file_path = os.path.join(destination_path, f"{pdb_id}.cif")  
+        file_path = os.path.join(destination_path, f"{pdb_id}.cif")
         try:
             response = requests.get(url, timeout=10)
             response.raise_for_status()
