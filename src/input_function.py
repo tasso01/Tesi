@@ -23,6 +23,7 @@ def copy_folder(source_path):
     destination_path = "files_cif"
     if os.path.exists(destination_path):
         print(f"Esiste già una cartella con il nome '{destination_path}'")
+        print("--------------------------------------------------")
         return
     try:
         shutil.copytree(source_path, destination_path)
@@ -35,6 +36,7 @@ def download_cif(source_path):
     destination_path = "files_cif"
     if os.path.exists(destination_path):
         print(f"Esiste già una cartella con il nome '{destination_path}'")
+        print("--------------------------------------------------")
         return
     os.makedirs(destination_path)
     with open(source_path, "r", encoding='utf-8') as file:
