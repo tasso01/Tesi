@@ -9,7 +9,7 @@ def run_tool():
         case "RNApolis Annotator":
             pass
         case "FR3D":
-            pass
+            fr3d()
         case "bpnet":
             pass
         case "baRNAba":
@@ -89,3 +89,25 @@ def rnaview():
     remove_unused_rnaview()
     remove_out_files_from_root()
     move_pdb_out_files()
+
+def fr3d():
+    if not os.path.exists("FR3D"):
+        os.makedirs("FR3D")
+    base_dir = os.path.abspath("C:/Users/Francesco/Desktop/tesi")
+    pdb_dir = os.path.join(base_dir, "files_pdb_id")
+    output_dir = os.path.join(base_dir, "FR3D")
+    classifiers_dir = os.path.join(base_dir, "fr3d-python", "fr3d", "classifiers")
+    pdb_files = [f for f in os.listdir(pdb_dir) if f.endswith(".pdb")]
+    os.chdir(classifiers_dir)
+    for pdb_file in pdb_files:
+        pdb_id = os.path.splitext(pdb_file)[0]
+        comando = [
+            "python", "NA_pairwise_interactions.py",
+            "-i", pdb_dir,
+            "-o", output_dir,
+            pdb_id
+        ]
+        subprocess.run(comando, check=True)
+    print("--------------------------------------------------")
+    print("Cartella 'FR3D' con gli output creata.")
+    print("--------------------------------------------------")
