@@ -92,7 +92,7 @@ def move_pdb_files():
             src_path = os.path.join(project_root, file)
             dst_path = os.path.join(pdb_folder, file)
             shutil.move(src_path, dst_path)
-    print("Convertiti tutti i files mmCIF presenti nella cartella 'files_pdb_id' in PDB")
+    print("Convertiti tutti i files mmCIF presenti nella cartella 'files_cif_id' in PDB")
     print("--------------------------------------------------")
 
 def cif_pdb_converter():
@@ -104,7 +104,6 @@ def cif_pdb_converter():
     for cif_file in cif_files:
         file_name_without_ext = os.path.splitext(cif_file)[0]
         command = f'"{beem_executable_path}" -p={file_name_without_ext} {cif_folder}\\{cif_file}'
-        print(f"Conversione {cif_file} to PDB")
         subprocess.run(command, shell=True, check=True)
     move_pdb_files()
 
