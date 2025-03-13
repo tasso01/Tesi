@@ -1,6 +1,6 @@
 import os
 
-def extract_base_pairs(file_path):
+def base_pairs_rnaview(file_path):
     extracted_lines = []
     inside_section = False
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -11,11 +11,11 @@ def extract_base_pairs(file_path):
                 extracted_lines.append(line.strip())
             if 'The total base pairs =' in line:
                 break
-    if not check_total_base_pairs(extracted_lines):
+    if not check_base_pairs_rnaview(extracted_lines):
         return []
-    return clean_base_pairs_list(extracted_lines)
+    return clean_base_pairs_rnaview(extracted_lines)
 
-def check_total_base_pairs(base_pairs_list):
+def check_base_pairs_rnaview(base_pairs_list):
     if not base_pairs_list:
         return False
     last_line = base_pairs_list[-1]
@@ -25,7 +25,7 @@ def check_total_base_pairs(base_pairs_list):
     except (IndexError, ValueError):
         return False
 
-def clean_base_pairs_list(base_pairs_list):
+def clean_base_pairs_rnaview(base_pairs_list):
     cleaned_list = []
     for line in base_pairs_list:
         if line.startswith("BEGIN_base-pair"):
@@ -33,9 +33,9 @@ def clean_base_pairs_list(base_pairs_list):
         if line.startswith("END_base-pair"):
             break
         cleaned_list.append(line)
-    return format_base_pairs(cleaned_list)
+    return format_base_pairs_rnaview(cleaned_list)
 
-def format_base_pairs(base_pairs_list):
+def format_base_pairs_rnaview(base_pairs_list):
     formatted_list = []
     for line in base_pairs_list:
         parts = line.split()
@@ -44,11 +44,11 @@ def format_base_pairs(base_pairs_list):
             num1, num2 = num1.strip(','), num2.strip(',')
             base1, base2 = parts[3][0], parts[3][2]
             formatted_list.append(f"{num1} {num2} {base1} {base2}")
-    first = first_bpseq(formatted_list)
-    second = second_bpseq(formatted_list)
-    return bpseq_lines(first, second)
+    first = first_bpseq_rnaview(formatted_list)
+    second = second_bpseq_rnaview(formatted_list)
+    return bpseq_lines_rnaview(first, second)
 
-def first_bpseq(base_pairs_list):
+def first_bpseq_rnaview(base_pairs_list):
     first_half = []
     for line in base_pairs_list:
         parts = line.split()
@@ -56,7 +56,7 @@ def first_bpseq(base_pairs_list):
         first_half.append(f"{num1} {base} {num2}")
     return first_half
 
-def second_bpseq(base_pairs_list):
+def second_bpseq_rnaview(base_pairs_list):
     second_half = []
     for line in base_pairs_list[::-1]:
         parts = line.split()
@@ -64,7 +64,7 @@ def second_bpseq(base_pairs_list):
         second_half.append(f"{num1} {base} {num2}")
     return second_half
 
-def bpseq_lines(first_half, second_half):
+def bpseq_lines_rnaview(first_half, second_half):
     return first_half + second_half
 
 def rnaview_bpseq():
@@ -76,9 +76,44 @@ def rnaview_bpseq():
     for filename in os.listdir(input_folder):
         if filename.endswith(".out"):
             file_path = os.path.join(input_folder, filename)
-            base_pairs_section = extract_base_pairs(file_path)
+            base_pairs_section = base_pairs_rnaview(file_path)
             if base_pairs_section:
                 output_file = os.path.join(output_folder, filename.replace(".pdb.out", ".bpseq"))
                 with open(output_file, 'w', encoding='utf-8') as bpseq_file:
                     for line in base_pairs_section:
                         bpseq_file.write(line + '\n')
+
+def baes_pairs_fr3d(file_path):
+    formatted_list = []
+    with open(file_path, 'r', encoding='utf-8') as file:
+        for line in file:
+            parts = line.split('|')
+            base1, base2 = parts[3], parts[7]
+            num1 = parts[4].split()[0]
+            num2 = parts[8].split()[0]
+            formatted_list.append(f"{base1} {num1} {base2} {num2}")
+    return bpseq_lines_fr3d(formatted_list)
+
+def bpseq_lines_fr3d(base_pairs_list):
+    bpseq_lines = []
+    for line in base_pairs_list:
+        parts = line.split()
+        num1, base, num2 = parts[1], parts[0], parts[3]
+        bpseq_lines.append(f"{num1} {base} {num2}")
+    return bpseq_lines
+
+def fr3d_bpseq():
+    input_folder = r"C:\Users\Francesco\Desktop\tesi\fr3d"
+    output_folder = r"C:\Users\Francesco\Desktop\tesi\fr3d_bpseq"
+    os.makedirs(output_folder, exist_ok=True)
+    for filename in os.listdir(input_folder):
+        if filename.endswith(".txt"):
+            file_path = os.path.join(input_folder, filename)
+            base_pairs_section = baes_pairs_fr3d(file_path)
+            if base_pairs_section:
+                output_file = os.path.join(output_folder, filename.replace(".txt", ".bpseq"))
+                with open(output_file, 'w', encoding='utf-8') as bpseq_file:
+                    for line in base_pairs_section:
+                        bpseq_file.write(line + '\n')
+    print(f"Cartella 'fr3d_bpseq' con i bpseq creata.")
+    print("--------------------------------------------------")
