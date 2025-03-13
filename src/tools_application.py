@@ -1,7 +1,7 @@
 import os
 import subprocess
 import shutil
-from src import get_tool
+from src import bpseq_conversion, get_tool
 
 def run_tool():
     tool_to_run = get_tool()
@@ -16,6 +16,7 @@ def run_tool():
             pass
         case "RNAView":
             rnaview()
+            bpseq_conversion.rnaview_bpseq()
         case "MC-Annotate":
             pass
 
