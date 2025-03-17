@@ -71,8 +71,6 @@ def rnaview_bpseq():
     input_folder = "rnaview"
     output_folder = "rnaview_bpseq"
     os.makedirs(output_folder, exist_ok=True)
-    print(f"Cartella '{output_folder}' con i bpseq creata.")
-    print("--------------------------------------------------")
     for filename in os.listdir(input_folder):
         if filename.endswith(".out"):
             file_path = os.path.join(input_folder, filename)
@@ -82,6 +80,8 @@ def rnaview_bpseq():
                 with open(output_file, 'w', encoding='utf-8') as bpseq_file:
                     for line in base_pairs_section:
                         bpseq_file.write(line + '\n')
+    print(f"Cartella '{output_folder}' con i bpseq creata.")
+    print("--------------------------------------------------")
 
 def baes_pairs_fr3d(file_path):
     formatted_list = []
@@ -103,8 +103,10 @@ def bpseq_lines_fr3d(base_pairs_list):
     return bpseq_lines
 
 def fr3d_bpseq():
-    input_folder = r"C:\Users\Francesco\Desktop\tesi\fr3d"
-    output_folder = r"C:\Users\Francesco\Desktop\tesi\fr3d_bpseq"
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(root_dir)
+    input_folder = os.path.join(root_dir, "fr3d")
+    output_folder = os.path.join(root_dir, "fr3d_bpseq")
     os.makedirs(output_folder, exist_ok=True)
     for filename in os.listdir(input_folder):
         if filename.endswith(".txt"):
@@ -115,5 +117,5 @@ def fr3d_bpseq():
                 with open(output_file, 'w', encoding='utf-8') as bpseq_file:
                     for line in base_pairs_section:
                         bpseq_file.write(line + '\n')
-    print(f"Cartella 'fr3d_bpseq' con i bpseq creata.")
+    print("Cartella 'fr3d_bpseq' con i bpseq creata.")
     print("--------------------------------------------------")

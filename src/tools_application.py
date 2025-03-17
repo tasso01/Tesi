@@ -94,12 +94,13 @@ def rnaview():
 def fr3d():
     if not os.path.exists("fr3d"):
         os.makedirs("fr3d")
-    base_dir = os.path.abspath("C:/Users/Francesco/Desktop/tesi")
-    pdb_dir = os.path.join(base_dir, "files_pdb_id")
-    output_dir = os.path.join(base_dir, "fr3d")
-    classifiers_dir = os.path.join(base_dir, "fr3d-python", "fr3d", "classifiers")
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(root_dir)
+    pdb_dir = os.path.join(root_dir, "files_pdb_id")
+    output_dir = os.path.join(root_dir, "fr3d")
+    application_dir = os.path.join(root_dir, "fr3d-python", "fr3d", "classifiers")
     pdb_files = [f for f in os.listdir(pdb_dir) if f.endswith(".pdb")]
-    os.chdir(classifiers_dir)
+    os.chdir(application_dir)
     for pdb_file in pdb_files:
         pdb_id = os.path.splitext(pdb_file)[0]
         comando = [
