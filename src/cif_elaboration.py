@@ -95,6 +95,17 @@ def move_pdb_files():
     print("Convertiti tutti i files mmCIF presenti nella cartella 'files_cif_id' in PDB")
     print("--------------------------------------------------")
 
+def delete_txt_files_from_main():
+    main_directory = os.path.dirname(os.path.abspath(__file__))
+    main_directory = os.path.dirname(main_directory)
+    for file in os.listdir(main_directory):
+        file_path = os.path.join(main_directory, file)
+        if os.path.isfile(file_path) and file.endswith(".txt") and file != "requirements.txt":
+            try:
+                os.remove(file_path)
+            except Exception as e:
+                print(f"Errore durante l'eliminazione di {file}: {e}")
+
 def cif_pdb_converter():
     beem_executable_path = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"
     cif_folder = "files_cif_id"
@@ -106,6 +117,7 @@ def cif_pdb_converter():
         command = f'"{beem_executable_path}" -p={file_name_without_ext} {cif_folder}\\{cif_file}'
         subprocess.run(command, shell=True, check=True)
     move_pdb_files()
+    delete_txt_files_from_main()
 
 def extract_atoms_from_ids2(file_cif, entity_ids):
     cif_dict = MMCIF2Dict(file_cif)
