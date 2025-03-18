@@ -141,12 +141,7 @@ def extract_atoms_from_ids2(file_cif, entity_ids):
         print(f"Nessun ATOM trovato per gli entity_id forniti in '{file_cif}'")
         return
     output_directory = "files_cif_id"
-    if os.path.exists(output_directory):
-        for file_name in os.listdir(output_directory):
-            file_path = os.path.join(output_directory, file_name)
-            os.remove(file_path)
-    else:
-        os.makedirs(output_directory)
+    os.makedirs(output_directory, exist_ok=True)
     pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
     output_file = os.path.join(output_directory, f"{pdb_id}_filtered.cif")
     with open(file_cif, encoding='utf-8') as infile:
