@@ -107,7 +107,10 @@ def delete_txt_files_from_main():
                 print(f"Errore durante l'eliminazione di {file}: {e}")
 
 def cif_pdb_converter():
-    beem_executable_path = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"
+    root_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = os.path.dirname(root_dir)
+    beem_executable_path = os.path.join(root_dir, "BeEM.exe")
+    beem_executable_path2 = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"
     cif_folder = "files_cif_id"
     if not os.path.exists(cif_folder):
         raise FileNotFoundError(f"La cartella {cif_folder} non esiste.")
