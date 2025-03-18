@@ -70,7 +70,12 @@ def bpseq_lines_rnaview(first_half, second_half):
 def rnaview_bpseq():
     input_folder = "rnaview"
     output_folder = "rnaview_bpseq"
-    os.makedirs(output_folder, exist_ok=True)
+    if os.path.exists(output_folder):
+        for file_name in os.listdir(output_folder):
+            file_path = os.path.join(output_folder, file_name)
+            os.remove(file_path)
+    else:
+        os.makedirs(output_folder)
     for filename in os.listdir(input_folder):
         if filename.endswith(".out"):
             file_path = os.path.join(input_folder, filename)
@@ -107,7 +112,12 @@ def fr3d_bpseq():
     root_dir = os.path.dirname(root_dir)
     input_folder = os.path.join(root_dir, "fr3d")
     output_folder = os.path.join(root_dir, "fr3d_bpseq")
-    os.makedirs(output_folder, exist_ok=True)
+    if os.path.exists(output_folder):
+        for file_name in os.listdir(output_folder):
+            file_path = os.path.join(output_folder, file_name)
+            os.remove(file_path)
+    else:
+        os.makedirs(output_folder)
     for filename in os.listdir(input_folder):
         if filename.endswith(".txt"):
             file_path = os.path.join(input_folder, filename)

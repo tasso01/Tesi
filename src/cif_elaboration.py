@@ -85,7 +85,11 @@ def move_pdb_files():
     src_directory = os.path.dirname(os.path.abspath(__file__))
     project_root = os.path.abspath(os.path.join(src_directory, os.pardir))
     pdb_folder = os.path.join(project_root, 'files_pdb_id')
-    if not os.path.exists(pdb_folder):
+    if os.path.exists(pdb_folder):
+        for file_name in os.listdir(pdb_folder):
+            file_path = os.path.join(pdb_folder, file_name)
+            os.remove(file_path)
+    else:
         os.makedirs(pdb_folder)
     for file in os.listdir(project_root):
         if file.endswith(".pdb"):
@@ -103,14 +107,13 @@ def delete_txt_files_from_main():
         if os.path.isfile(file_path) and file.endswith(".txt") and file != "requirements.txt":
             try:
                 os.remove(file_path)
-            except Exception as e:
+            except OSError as e:
                 print(f"Errore durante l'eliminazione di {file}: {e}")
 
 def cif_pdb_converter():
     root_dir = os.path.dirname(os.path.abspath(__file__))
     root_dir = os.path.dirname(root_dir)
     beem_executable_path = os.path.join(root_dir, "BeEM.exe")
-    beem_executable_path2 = r"C:\Users\Francesco\Desktop\tesi\BeEM.exe"
     cif_folder = "files_cif_id"
     if not os.path.exists(cif_folder):
         raise FileNotFoundError(f"La cartella {cif_folder} non esiste.")
