@@ -1,0 +1,53 @@
+
+name: CI
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  python:
+
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ["3.7", "3.8", "3.9", "3.10"]
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Set up Python ${{ matrix.python-version }}
+      uses: actions/setup-python@v4
+      with:
+        python-version: ${{ matrix.python-version }}
+    - name: Install
+      run: |
+        pip install .
+    - name: Test with pytest
+      run: |
+        pip install pytest pytest-cov
+        # run local version (PWD) so as to properly compute coverage
+        PYTHONPATH="$PWD" pytest -v --cov=barnaba
+        bash <(curl -s https://codecov.io/bash)
+    - name: Pylint
+      run: |
+        # this is imported in barnaba/sec_str_svg.py
+        # should be fixed (either imported conditionally or added as a dependency)
+        pip install matplotlib
+        pip install --upgrade  pylint
+        pylint -E barnaba
+    - name: Flake8
+      run: |
+        pip install --upgrade flake8
+        # stop the build if there are Python syntax errors or undefined names
+        flake8 . --count --select=E9,F63,F7,F82 --show-source --statistics
+        # exit-zero treats all errors as warnings. The GitHub editor is 127 chars wide
+        flake8 bussilab bin --count --exit-zero --max-complexity=10 --max-line-length=127 --statistics
+    - name: Deploy to PyPI
+      if: ${{ matrix.python-version == '3.10' && startsWith(github.ref, 'refs/tags/') }}
+      env:
+        BARNABABOT_PYPI: ${{ secrets.BARNABABOT_PYPI }}
+      run: |
+        pip install twine
+        python setup.py sdist
+        python -m twine upload -u __token__ -p "$BARNABABOT_PYPI" dist/barnaba-*.tar.gz

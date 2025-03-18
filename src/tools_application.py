@@ -14,7 +14,7 @@ def run_tool():
         case "bpnet":
             pass
         case "baRNAba":
-            pass
+            barnaba()
         case "RNAView":
             rnaview()
             bpseq_conversion.rnaview_bpseq()
@@ -107,3 +107,18 @@ def fr3d():
     print("--------------------------------------------------")
     print("Cartella 'fr3d' con gli output creata.")
     print("--------------------------------------------------")
+
+def barnaba():
+    pdb_folder = "files_pdb_id"
+    barnaba_script = "barnaba-master/bin/barnaba"
+    if not os.path.exists(pdb_folder):
+        print(f"La cartella {pdb_folder} non esiste.")
+        return
+    for filename in os.listdir(pdb_folder):
+        if filename.endswith(".pdb"):
+            file_path = os.path.join(pdb_folder, filename)
+            command = ["python", barnaba_script, "ANNOTATE", "--pdb", file_path]
+            try:
+                subprocess.run(command, check=True)
+            except subprocess.CalledProcessError as e:
+                print(f"Errore nell'esecuzione del comando per {filename}: {e}")
