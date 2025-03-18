@@ -66,6 +66,13 @@ def process_all_cif_files():
     if not cif_files:
         print("Nessun file .cif trovato nella cartella")
         return
+    destination_folder = "files_cif_id"
+    if os.path.exists(destination_folder):
+        for file_name in os.listdir(destination_folder):
+            file_path = os.path.join(destination_folder, file_name)
+            os.remove(file_path)
+    else:
+        os.makedirs(destination_folder)
     molecule_type = get_molecule_type()
     polymer_type = get_polymer_type()
     if polymer_type:
@@ -141,7 +148,6 @@ def extract_atoms_from_ids2(file_cif, entity_ids):
         print(f"Nessun ATOM trovato per gli entity_id forniti in '{file_cif}'")
         return
     output_directory = "files_cif_id"
-    os.makedirs(output_directory, exist_ok=True)
     pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
     output_file = os.path.join(output_directory, f"{pdb_id}_filtered.cif")
     with open(file_cif, encoding='utf-8') as infile:

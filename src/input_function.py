@@ -22,9 +22,7 @@ def insert_path(valid_path):
 def copy_folder(source_path):
     destination_path = "files_cif"
     if os.path.exists(destination_path):
-        print(f"Esiste già una cartella con il nome '{destination_path}'")
-        print("--------------------------------------------------")
-        return
+        shutil.rmtree(destination_path)
     try:
         shutil.copytree(source_path, destination_path)
         print(f"Cartella '{destination_path}' contenente i file mmCIF importata")
@@ -35,10 +33,11 @@ def copy_folder(source_path):
 def download_cif(source_path):
     destination_path = "files_cif"
     if os.path.exists(destination_path):
-        print(f"Esiste già una cartella con il nome '{destination_path}'")
-        print("--------------------------------------------------")
-        return
-    os.makedirs(destination_path)
+        for file_name in os.listdir(destination_path):
+            file_path = os.path.join(destination_path, file_name)
+            os.remove(file_path)
+    else:
+        os.makedirs(destination_path)
     with open(source_path, "r", encoding='utf-8') as file:
         content = file.read().strip()
     id_pdbs = content.split(",")
