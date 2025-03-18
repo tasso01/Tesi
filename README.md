@@ -42,4 +42,9 @@ Valori disponibili tool:
 - f: FR3D
 - r: RNAView
 
+OUTPUT:
+I file di output per ogni tool con il relativo bpseq si trovano nelle cartelle così definite:
+- FR3D: fr3d/fr3d_bpseq
+- RNAView: rnaview/rnaview_bpseq
+
 
