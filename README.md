@@ -4,34 +4,34 @@ REQUISTI:
 
 INSTALLAZIONE:
 - Scaricare la repository
-- Nella cartella scaricata eseguire <pip install -r requirements.txt>
+- Nella cartella scaricata eseguire `pip install -r requirements.txt`
 
 Configurazione 'FR3D':
-- <cd fr3d-python>
-- <python -m pip install .>
+- `cd fr3d-python`
+- `python -m pip install .`
 
 Configurazione 'RNAView':
 - Command Prompt:
-  - <setx RNAVIEW "percorso_cartella\RNAView-master">
-  - <setx PATH "%RNAVIEW%\bin;%PATH%">
+  - `setx RNAVIEW "percorso_cartella\RNAView-master"`
+  - `setx PATH "%RNAVIEW%\bin;%PATH%"`
   - riavviare Command Prompt
 - C shell (csh):
-  - <nano ~/.cshrc>
+  - `nano ~/.cshrc`
   - aggiungere alla fine del file le seguenti 2 righe:
     - setenv RNAVIEW percorso_cartella/RNAView-master
     - setenv PATH "percorso_cartella/RNAView-master/bin:"$PATH
   - salvare le modifiche e chiudere
-  - <source ~/.cshrc>
+  - `source ~/.cshrc`
 - Bourne shell (bash):
-  - <nano ~/.bashrc>
+  - `nano ~/.bashrc`
   - aggiungere alla fine del file le seguenti 2 righe:
     - RNAVIEW=/percorso_cartella/RNAView-master; export RNAVIEW
     - PATH="/percorso_cartella/RNAView-master/bin:"$PATH; export PATH
   - salvare le modifiche e chiudere
-  - <source ~/.bashrc>
+  - `source ~/.bashrc`
 
 UTILIZZO:
-python main.py "percorso cartella con file cif/percorso file di testo con pdb_id" -p <polimero>/-m <molecola> -t <tool>
+`python main.py "percorso cartella con file cif/percorso file di testo con pdb_id" -p <polimero>/-m <molecola> -t <tool>`
 
 Valori disponibili polimero:
 - r: polyribonucleotide (RNA)
