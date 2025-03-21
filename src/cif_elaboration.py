@@ -17,7 +17,6 @@ def extract_atoms_from_ids(file_cif, entity_ids):
         if g == "ATOM" and eid in entity_ids:
             atom_indices[eid].append(i + 1)
     output_directory = "files_cif_id"
-    os.makedirs(output_directory, exist_ok=True)
     pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
     with open(file_cif, encoding='utf-8') as infile:
         lines = infile.readlines()
@@ -60,8 +59,6 @@ def extract_ids_from_polymer(mmcif_file, polymer):
 
 def process_all_cif_files():
     cif_directory = "files_cif"
-    if not os.path.exists(cif_directory):
-        raise FileNotFoundError(f"La cartella {cif_directory} non esiste.")
     cif_files = [f for f in os.listdir(cif_directory) if f.endswith(".cif")]
     if not cif_files:
         print("Nessun file .cif trovato nella cartella")
@@ -89,28 +86,26 @@ def process_all_cif_files():
     print("--------------------------------------------------")
 
 def move_pdb_files():
-    src_directory = os.path.dirname(os.path.abspath(__file__))
-    project_root = os.path.abspath(os.path.join(src_directory, os.pardir))
-    pdb_folder = os.path.join(project_root, 'files_pdb_id')
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    pdb_folder = os.path.join(root_dir, 'files_pdb_id')
     if os.path.exists(pdb_folder):
         for file_name in os.listdir(pdb_folder):
             file_path = os.path.join(pdb_folder, file_name)
             os.remove(file_path)
     else:
         os.makedirs(pdb_folder)
-    for file in os.listdir(project_root):
+    for file in os.listdir(root_dir):
         if file.endswith(".pdb"):
-            src_path = os.path.join(project_root, file)
+            src_path = os.path.join(root_dir, file)
             dst_path = os.path.join(pdb_folder, file)
             shutil.move(src_path, dst_path)
     print("Convertiti tutti i files mmCIF presenti nella cartella 'files_cif_id' in PDB")
     print("--------------------------------------------------")
 
 def delete_txt_files_from_main():
-    main_directory = os.path.dirname(os.path.abspath(__file__))
-    main_directory = os.path.dirname(main_directory)
-    for file in os.listdir(main_directory):
-        file_path = os.path.join(main_directory, file)
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    for file in os.listdir(root_dir):
+        file_path = os.path.join(root_dir, file)
         if os.path.isfile(file_path) and file.endswith(".txt") and file != "requirements.txt":
             try:
                 os.remove(file_path)
@@ -118,12 +113,9 @@ def delete_txt_files_from_main():
                 print(f"Errore durante l'eliminazione di {file}: {e}")
 
 def cif_pdb_converter():
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    root_dir = os.path.dirname(root_dir)
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     beem_executable_path = os.path.join(root_dir, "BeEM.exe")
     cif_folder = "files_cif_id"
-    if not os.path.exists(cif_folder):
-        raise FileNotFoundError(f"La cartella {cif_folder} non esiste.")
     cif_files = [f for f in os.listdir(cif_folder) if f.endswith(".cif")]
     for cif_file in cif_files:
         file_name_without_ext = os.path.splitext(cif_file)[0]

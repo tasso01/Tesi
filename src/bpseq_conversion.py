@@ -108,8 +108,7 @@ def bpseq_lines_fr3d(base_pairs_list):
     return bpseq_lines
 
 def fr3d_bpseq():
-    root_dir = os.path.dirname(os.path.abspath(__file__))
-    root_dir = os.path.dirname(root_dir)
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     input_folder = os.path.join(root_dir, "fr3d")
     output_folder = os.path.join(root_dir, "fr3d_bpseq")
     if os.path.exists(output_folder):
