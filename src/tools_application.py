@@ -15,6 +15,7 @@ def run_tool():
             pass
         case "baRNAba":
             barnaba()
+            bpseq_conversion.barnaba_bpseq()
         case "RNAView":
             rnaview()
             bpseq_conversion.rnaview_bpseq()
@@ -105,7 +106,7 @@ def fr3d():
         ]
         subprocess.run(comando, check=True)
     print("--------------------------------------------------")
-    print("Cartella 'fr3d' con gli output creata.")
+    print(f"Cartella '{destination_folder}' con gli output creata.")
     print("--------------------------------------------------")
 
 def barnaba():
@@ -128,6 +129,9 @@ def barnaba():
             except subprocess.CalledProcessError as e:
                 print(f"Errore nell'esecuzione del comando per {filename}: {e}")
             move_barnaba_out(pdb_id)
+    print("--------------------------------------------------")
+    print(f"Cartella '{destination_folder}' con gli output creata.")
+    print("--------------------------------------------------")
 
 def move_barnaba_out(pdb_id):
     base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
