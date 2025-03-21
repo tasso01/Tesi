@@ -109,16 +109,34 @@ def fr3d():
     print("--------------------------------------------------")
 
 def barnaba():
+    destination_folder = "barnaba"
+    if os.path.exists(destination_folder):
+        for file_name in os.listdir(destination_folder):
+            file_path = os.path.join(destination_folder, file_name)
+            os.remove(file_path)
+    else:
+        os.makedirs(destination_folder)
     pdb_folder = "files_pdb_id"
     barnaba_script = "barnaba-master/bin/barnaba"
-    if not os.path.exists(pdb_folder):
-        print(f"La cartella {pdb_folder} non esiste.")
-        return
     for filename in os.listdir(pdb_folder):
         if filename.endswith(".pdb"):
+            pdb_id = os.path.splitext(filename)[0]
             file_path = os.path.join(pdb_folder, filename)
             command = ["python", barnaba_script, "ANNOTATE", "--pdb", file_path]
             try:
                 subprocess.run(command, check=True)
             except subprocess.CalledProcessError as e:
                 print(f"Errore nell'esecuzione del comando per {filename}: {e}")
+            move_barnaba_out(pdb_id)
+
+def move_barnaba_out(pdb_id):
+    base_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_dir = os.path.join(base_dir, "barnaba")
+    for filename in os.listdir(base_dir):
+        file_path = os.path.join(base_dir, filename)
+        if filename.endswith(".stacking.out"):
+            os.remove(file_path)
+        elif filename.endswith(".pairing.out"):
+            new_name = f"{pdb_id}.out"
+            new_path = os.path.join(target_dir, new_name)
+            shutil.move(file_path, new_path)
