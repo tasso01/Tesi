@@ -42,7 +42,7 @@ def extract_ids_from_molecule(mmcif_file, molecule):
                 entity_ids.add(int(entity_id))
             except ValueError:
                 continue
-    extract_atoms_from_ids2(mmcif_file, entity_ids)
+    extract_atoms_from_ids(mmcif_file, entity_ids)
 
 def extract_ids_from_polymer(mmcif_file, polymer):
     entity_ids = set()
@@ -55,7 +55,7 @@ def extract_ids_from_polymer(mmcif_file, polymer):
                 entity_ids.add(int(entity_id))
             except ValueError:
                 continue
-    extract_atoms_from_ids2(mmcif_file, entity_ids)
+    extract_atoms_from_ids(mmcif_file, entity_ids)
 
 def process_all_cif_files():
     cif_directory = "files_cif"
