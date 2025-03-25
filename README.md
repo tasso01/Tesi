@@ -1,6 +1,7 @@
 REQUISTI:
 - Python
 - Compilatore C++
+- Microsoft Visual C++
 
 INSTALLAZIONE:
 - Scaricare la repository
@@ -30,6 +31,10 @@ Configurazione 'RNAView':
   - salvare le modifiche e chiudere
   - `source ~/.bashrc`
 
+Configurazione 'Barnaba':
+- `cd barnaba-master`
+- `pip install .`
+
 UTILIZZO:
 `python main.py "percorso cartella con file cif/percorso file di testo con pdb_id" -p <polimero>/-m <molecola> -t <tool>`
 
@@ -39,12 +44,12 @@ Valori disponibili polimero:
 - h: polydeoxyribonucleotide/polyribonucleotide hybrid (IBRIDO)
 
 Valori disponibili tool:
+- b: Barnaba
 - f: FR3D
 - r: RNAView
 
 OUTPUT:
-I file di output per ogni tool con il relativo bpseq si trovano nelle cartelle così definite:
-- FR3D: fr3d - fr3d_bpseq
-- RNAView: rnaview - rnaview_bpseq
+Le indicazioni su dove trovare all'interno del progetto gli output derivati dall'applicazione dei vari tool, si possono trovare nel file 'output.csv'
+
 
 
