@@ -108,9 +108,9 @@ def bpseq_lines_first_second(first_half, second_half):
     return first_half + second_half
 
 def rnaview_bpseq():
-    input_folder = "rnaview"
-    output_folder = "rnaview_bpseq"
-    out_folder = "rnaview_txt"
+    input_folder = "output\\rnaview"
+    output_folder = "output\\rnaview_bpseq"
+    out_folder = "output\\rnaview_txt"
     if os.path.exists(output_folder):
         for file_name in os.listdir(output_folder):
             file_path = os.path.join(output_folder, file_name)
@@ -177,9 +177,9 @@ def bpseq_lines_fr3d(base_pairs_list):
 
 def fr3d_bpseq():
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    input_folder = os.path.join(root_dir, "fr3d")
-    output_folder = os.path.join(root_dir, "fr3d_bpseq")
-    out_folder = os.path.join(root_dir, "fr3d_txt")
+    input_folder = os.path.join(root_dir, "output\\fr3d")
+    output_folder = os.path.join(root_dir, "output\\fr3d_bpseq")
+    out_folder = os.path.join(root_dir, "output\\fr3d_txt")
     if os.path.exists(output_folder):
         for file_name in os.listdir(output_folder):
             file_path = os.path.join(output_folder, file_name)
@@ -261,9 +261,9 @@ def txt_lines_barnaba(base_pairs_list):
     return bpseq_lines_first_second(first, second)
 
 def barnaba_bpseq():
-    input_folder = "barnaba"
-    output_folder = "barnaba_bpseq"
-    out_folder = "barnaba_txt"
+    input_folder = "output\\barnaba"
+    output_folder = "output\\barnaba_bpseq"
+    out_folder = "output\\barnaba_txt"
     if os.path.exists(output_folder):
         for file_name in os.listdir(output_folder):
             file_path = os.path.join(output_folder, file_name)

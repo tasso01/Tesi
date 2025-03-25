@@ -49,8 +49,8 @@ def check_tool():
     save_csv()
 
 def fr3d_output():
-    bpseq_folder = "fr3d_bpseq"
-    txt_folder = "fr3d_txt"
+    bpseq_folder = "output\\fr3d_bpseq"
+    txt_folder = "output\\fr3d_txt"
     for filename in os.listdir(bpseq_folder):
         bpseq_path = os.path.join(bpseq_folder, filename)
         pdb_id = os.path.splitext(filename)[0]
@@ -69,8 +69,8 @@ def fr3d_output():
     insert_from_init(output_number)
 
 def barnaba_output():
-    bpseq_folder = "barnaba_bpseq"
-    txt_folder = "barnaba_txt"
+    bpseq_folder = "output\\barnaba_bpseq"
+    txt_folder = "output\\barnaba_txt"
     for filename in os.listdir(bpseq_folder):
         bpseq_path = os.path.join(bpseq_folder, filename)
         pdb_id = os.path.splitext(filename)[0]
@@ -89,8 +89,8 @@ def barnaba_output():
     insert_from_init(output_number)
 
 def rnaview_output():
-    bpseq_folder = "rnaview_bpseq"
-    txt_folder = "rnaview_txt"
+    bpseq_folder = "output\\rnaview_bpseq"
+    txt_folder = "output\\rnaview_txt"
     for filename in os.listdir(bpseq_folder):
         bpseq_path = os.path.join(bpseq_folder, filename)
         pdb_id = os.path.splitext(filename)[0]
