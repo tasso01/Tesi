@@ -1,4 +1,15 @@
 import os
+from src import get_tool
+
+def convert_output():
+    tool_to_run = get_tool()
+    match tool_to_run:
+        case "FR3D":
+            fr3d_bpseq()
+        case "baRNAba":
+            barnaba_bpseq()
+        case "RNAView":
+            rnaview_bpseq()
 
 def base_pairs_rnaview(file_path):
     extracted_lines = []

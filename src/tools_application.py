@@ -1,26 +1,17 @@
 import os
 import subprocess
 import shutil
-from src import bpseq_conversion, get_tool
+from src import get_tool
 
 def run_tool():
     tool_to_run = get_tool()
     match tool_to_run:
-        case "RNApolis Annotator":
-            pass
         case "FR3D":
             fr3d()
-            bpseq_conversion.fr3d_bpseq()
-        case "bpnet":
-            pass
         case "baRNAba":
             barnaba()
-            bpseq_conversion.barnaba_bpseq()
         case "RNAView":
             rnaview()
-            bpseq_conversion.rnaview_bpseq()
-        case "MC-Annotate":
-            pass
 
 def remove_out_files_from_root():
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
