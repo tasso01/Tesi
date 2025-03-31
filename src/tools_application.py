@@ -58,7 +58,7 @@ def rnaview():
             os.remove(file_path)
     else:
         os.makedirs(destination_folder)
-    pdb_files = [f for f in os.listdir(folder_path) if f.endswith('.pdb')]
+    pdb_files = [f for f in os.listdir(folder_path)]
     for pdb_file in pdb_files:
         pdb_path = os.path.join(folder_path, pdb_file)
         try:
@@ -84,7 +84,7 @@ def fr3d():
     pdb_dir = os.path.join(root_dir, "files_pdb_id")
     output_dir = os.path.join(root_dir, destination_folder)
     application_dir = os.path.join(root_dir, "fr3d-python", "fr3d", "classifiers")
-    pdb_files = [f for f in os.listdir(pdb_dir) if f.endswith(".pdb")]
+    pdb_files = [f for f in os.listdir(pdb_dir)]
     os.chdir(application_dir)
     for pdb_file in pdb_files:
         pdb_id = os.path.splitext(pdb_file)[0]
@@ -132,6 +132,6 @@ def move_barnaba_out(pdb_id):
         if filename.endswith(".stacking.out"):
             os.remove(file_path)
         elif filename.endswith(".pairing.out"):
-            new_name = f"{pdb_id}.out"
+            new_name = f"{pdb_id}.pairing.out"
             new_path = os.path.join(target_dir, new_name)
             shutil.move(file_path, new_path)

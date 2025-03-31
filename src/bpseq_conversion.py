@@ -55,14 +55,13 @@ def base_pairs_lines_rnaview(base_pairs_list):
     non_canonical = []
     for line in base_pairs_list:
         parts = line.split()
-        if len(parts) >= 4:
-            num1, num2 = parts[0].split('_')
-            num1, num2 = num1.strip(','), num2.strip(',')
-            base1, base2 = parts[3][0], parts[3][2]
-            if canonical_base(base1, base2):
-                canonical.append(f"{num1} {num2} {base1} {base2}")
-            else:
-                non_canonical.append(f"{num1} {num2} {base1} {base2}")
+        num1, num2 = parts[0].split('_')
+        num1, num2 = num1.strip(','), num2.strip(',')
+        base1, base2 = parts[3][0], parts[3][2]
+        if canonical_base(base1, base2):
+            canonical.append(f"{num1} {num2} {base1} {base2}")
+        else:
+            non_canonical.append(f"{num1} {num2} {base1} {base2}")
     first_canonical = first_base_pairs(canonical)
     second_canonical = second_base_pairs(canonical)
     first_non_canonical = first_base_pairs(non_canonical)
@@ -221,12 +220,12 @@ def barnaba_bpseq():
             file_path = os.path.join(output_folder, filename)
             canonical, non_canonical = base_pairs_barnaba(file_path)
             if canonical:
-                output_file = os.path.join(bpseq_folder, filename.replace(".out", ".bpseq"))
+                output_file = os.path.join(bpseq_folder, filename.replace(".pairing.out", ".bpseq"))
                 with open(output_file, 'w', encoding='utf-8') as bpseq_file:
                     for line in canonical:
                         bpseq_file.write(line + '\n')
             if non_canonical:
-                out_file = os.path.join(txt_folder, filename.replace(".out", ".txt"))
+                out_file = os.path.join(txt_folder, filename.replace(".pairing.out", ".txt"))
                 with open(out_file, 'w', encoding='utf-8') as txt_file:
                     for line in non_canonical:
                         txt_file.write(line + '\n')

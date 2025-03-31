@@ -59,10 +59,7 @@ def extract_ids_from_polymer(mmcif_file, polymer):
 
 def process_all_cif_files():
     cif_directory = "files_cif"
-    cif_files = [f for f in os.listdir(cif_directory) if f.endswith(".cif")]
-    if not cif_files:
-        print("Nessun file .cif trovato nella cartella")
-        return
+    cif_files = [f for f in os.listdir(cif_directory)]
     destination_folder = "files_cif_id"
     if os.path.exists(destination_folder):
         for file_name in os.listdir(destination_folder):
@@ -70,16 +67,14 @@ def process_all_cif_files():
             os.remove(file_path)
     else:
         os.makedirs(destination_folder)
-    molecule_type = get_molecule_type()
-    polymer_type = get_polymer_type()
-    if polymer_type:
+    if get_polymer_type():
         for cif_file in cif_files:
             cif_path = os.path.join(cif_directory, cif_file)
-            extract_ids_from_polymer(cif_path, polymer_type)
-    elif molecule_type:
+            extract_ids_from_polymer(cif_path, get_polymer_type())
+    elif get_molecule_type():
         for cif_file in cif_files:
             cif_path = os.path.join(cif_directory, cif_file)
-            extract_ids_from_molecule(cif_path, molecule_type)
+            extract_ids_from_molecule(cif_path, get_molecule_type())
     else:
         raise TypeError("Polimero o Molecola mancante")
     print(f"Molecole estratte da tutti i file mmCIF presenti nella cartella '{cif_directory}'")
@@ -87,7 +82,7 @@ def process_all_cif_files():
 
 def move_pdb_files():
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    pdb_folder = os.path.join(root_dir, 'files_pdb_id')
+    pdb_folder = 'files_pdb_id'
     if os.path.exists(pdb_folder):
         for file_name in os.listdir(pdb_folder):
             file_path = os.path.join(pdb_folder, file_name)
@@ -113,10 +108,9 @@ def delete_txt_files_from_main():
                 print(f"Errore durante l'eliminazione di {file}: {e}")
 
 def cif_pdb_converter():
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    beem_executable_path = os.path.join(root_dir, "BeEM.exe")
+    beem_executable_path = "BeEM.exe"
     cif_folder = "files_cif_id"
-    cif_files = [f for f in os.listdir(cif_folder) if f.endswith(".cif")]
+    cif_files = [f for f in os.listdir(cif_folder)]
     for cif_file in cif_files:
         file_name_without_ext = os.path.splitext(cif_file)[0]
         command = f'"{beem_executable_path}" -p={file_name_without_ext} {cif_folder}\\{cif_file}'
