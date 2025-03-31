@@ -6,11 +6,11 @@ from src import get_tool
 def run_tool():
     tool_to_run = get_tool()
     match tool_to_run:
-        case "FR3D":
+        case "fr3d":
             fr3d()
-        case "baRNAba":
+        case "barnaba":
             barnaba()
-        case "RNAView":
+        case "rnaview":
             rnaview()
 
 def remove_out_files_from_root():

@@ -77,12 +77,9 @@ def insert_polymer(polymer):
 
 def insert_tool(tool):
     tools = {
-        'a': "RNApolis Annotator",
-        'f': "FR3D",
-        'n': "bpnet",
-        'b': "baRNAba",
-        'r': "RNAView",
-        'm': "MC-Annotate"
+        'f': "fr3d",
+        'b': "barnaba",
+        'r': "rnaview",
     }
     if tool not in tools:
         raise ValueError("Tool non valido")

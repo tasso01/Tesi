@@ -4,11 +4,11 @@ from src import get_tool
 def convert_output():
     tool_to_run = get_tool()
     match tool_to_run:
-        case "FR3D":
+        case "fr3d":
             fr3d_bpseq()
-        case "baRNAba":
+        case "barnaba":
             barnaba_bpseq()
-        case "RNAView":
+        case "rnaview":
             rnaview_bpseq()
 
 def canonical_base(a, b):

@@ -41,11 +41,11 @@ def add_txt_output(txt):
 def check_tool():
     tool = get_tool()
     match tool:
-        case "FR3D":
+        case "fr3d":
             output_generator("fr3d")
-        case "baRNAba":
+        case "barnaba":
             output_generator("barnaba")
-        case "RNAView":
+        case "rnaview":
             output_generator("rnaview")
     save_csv()
 
