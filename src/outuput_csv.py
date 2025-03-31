@@ -70,6 +70,33 @@ def output_generator(tool):
         add_txt_output(txt_path)
     output_number = len(os.listdir(bpseq_folder))
     insert_from_init(output_number)
+    insert_non_canonical(tool)
+
+def insert_non_canonical(tool):
+    bpseq_folder = f"output\\{tool}_bpseq"
+    txt_folder = f"output\\{tool}_txt"
+    non_canonical = []
+    bpseq_files = {
+        os.path.splitext(f)[0]
+        for f in os.listdir(bpseq_folder)
+    }
+    for f in os.listdir(txt_folder):
+        base_name = os.path.splitext(f)[0]
+        if base_name not in bpseq_files:
+            non_canonical.append(f)
+    for file in non_canonical:
+        txt_path = os.path.join(txt_folder, file)
+        pdb_id = os.path.splitext(file)[0]
+        pdb = pdb_id.split('_')[0]
+        chain = pdb_id.split('_')[1].split('-')[0]
+        add_pdb_id(pdb)
+        add_chain(chain)
+        if (get_polymer_type()):
+            add_molecule(molecule_from_polymer(pdb, chain))
+        add_bpseq_output("")
+        add_txt_output(txt_path)
+    output_number = len(non_canonical)
+    insert_from_init(output_number)
 
 def insert_from_init(n):
     polymer = polymer_from_molecule()
@@ -80,8 +107,6 @@ def insert_from_init(n):
             add_polymer(polymer)
         elif get_polymer_type():
             add_polymer(get_polymer_type())
-        else:
-            raise TypeError("Polimero o Molecola mancante")
 
 def from_id_to_file(pdb_id):
     for file in os.listdir("files_cif"):
