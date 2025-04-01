@@ -15,7 +15,11 @@ def canonical_base(a, b):
     return (a == 'C' and b == 'G') or \
            (a == 'G' and b == 'C') or \
            (a == 'A' and b == 'U') or \
-           (a == 'U' and b == 'A')
+           (a == 'U' and b == 'A') or \
+           (a == 'DC' and b == 'DG') or \
+           (a == 'DG' and b == 'DC') or \
+           (a == 'DA' and b == 'DT') or \
+           (a == 'DT' and b == 'DA')
 
 def first_base_pairs(base_pairs_list):
     first_half = []
