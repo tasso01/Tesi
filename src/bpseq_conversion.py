@@ -21,6 +21,9 @@ def canonical_base(a, b):
            (a == 'DA' and b == 'DT') or \
            (a == 'DT' and b == 'DA')
 
+def canonical_link(l):
+    return l in ["cWW", "WWc", "WCc", "W/W cis", "+/+ cis", "-/- cis"]
+
 def first_base_pairs(base_pairs_list):
     first_half = []
     for line in base_pairs_list:
@@ -62,7 +65,10 @@ def base_pairs_lines_rnaview(base_pairs_list):
         num1, num2 = parts[0].split('_')
         num1, num2 = num1.strip(','), num2.strip(',')
         base1, base2 = parts[3][0], parts[3][2]
-        if canonical_base(base1, base2):
+        link = ""
+        if (parts[6] in ["W/W", "+/+", "-/-"]):
+            link = parts[6] + " " + parts[7]
+        if canonical_base(base1, base2) and canonical_link(link):
             canonical.append(f"{num1} {num2} {base1} {base2}")
         else:
             non_canonical.append(f"{num1} {num2} {base1} {base2}")
@@ -118,7 +124,8 @@ def base_pairs_fr3d(file_path):
             base1, base2 = parts[3], parts[7]
             num1 = parts[4].split()[0]
             num2 = parts[8].split()[0]
-            if canonical_base(base1, base2):
+            link = parts[4].split()[1]
+            if canonical_base(base1, base2) and canonical_link(link):
                 canonical.append(f"{base1} {num1} {base2} {num2}")
             else:
                 non_canonical.append(f"{base1} {num1} {base2} {num2}")
@@ -163,7 +170,7 @@ def fr3d_bpseq():
                     for line in canonical:
                         bpseq_file.write(line + '\n')
             if non_canonical:
-                out_file = os.path.join(txt_folder, filename.replace(".out", ".txt"))
+                out_file = os.path.join(txt_folder, filename.replace(".txt", ".txt"))
                 with open(out_file, 'w', encoding='utf-8') as txt_file:
                     for line in non_canonical:
                         txt_file.write(line + '\n')
@@ -191,7 +198,8 @@ def base_pairs_lines_barnaba(base_pairs_list):
         parts = line.split()
         num1, num2 = parts[0].split("_")[1], parts[1].split("_")[1]
         base1, base2 = parts[0].split("_")[0], parts[1].split("_")[0]
-        if canonical_base(base1, base2):
+        link = parts[2]
+        if canonical_base(base1, base2) and canonical_link(link):
             canonical.append(f"{num1} {num2} {base1} {base2}")
         else:
             non_canonical.append(f"{num1} {num2} {base1} {base2}")
