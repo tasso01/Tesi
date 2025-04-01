@@ -16,20 +16,6 @@ Configurazione 'RNAView':
   - `setx RNAVIEW "percorso_cartella\RNAView-master"`
   - `setx PATH "%RNAVIEW%\bin;%PATH%"`
   - riavviare Command Prompt
-- C shell (csh):
-  - `nano ~/.cshrc`
-  - aggiungere alla fine del file le seguenti 2 righe:
-    - setenv RNAVIEW percorso_cartella/RNAView-master
-    - setenv PATH "percorso_cartella/RNAView-master/bin:"$PATH
-  - salvare le modifiche e chiudere
-  - `source ~/.cshrc`
-- Bourne shell (bash):
-  - `nano ~/.bashrc`
-  - aggiungere alla fine del file le seguenti 2 righe:
-    - RNAVIEW=/percorso_cartella/RNAView-master; export RNAVIEW
-    - PATH="/percorso_cartella/RNAView-master/bin:"$PATH; export PATH
-  - salvare le modifiche e chiudere
-  - `source ~/.bashrc`
 
 Configurazione 'Barnaba':
 - `cd barnaba-master`
@@ -51,5 +37,7 @@ Valori disponibili tool:
 OUTPUT:
 Le indicazioni su dove trovare all'interno del progetto gli output derivati dall'applicazione dei vari tool, si possono trovare nel file 'output.csv'
 
-
-
+Sono stati integrati i seguenti 3 progetti:
+- barnaba: https://github.com/srnas/barnaba
+- FR3D: https://github.com/BGSU-RNA/fr3d-python
+- RNAView: https://github.com/rcsb/RNAView
