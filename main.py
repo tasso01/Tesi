@@ -6,6 +6,10 @@ import argparse
 from src import input_function, cif_elaboration, tools_application, bpseq_conversion, outuput_csv
 
 def main():
+    """
+    Punto d'ingresso principale del programma.
+    Accetta gli argomenti da linea di comando e chiama le relative funzioni.
+    """
     parser = argparse.ArgumentParser(description="Line Command Args")
     parser.add_argument("file_system_path", type=str, help="Percorso del file system")
     group = parser.add_mutually_exclusive_group(required=True)

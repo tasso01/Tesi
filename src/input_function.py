@@ -12,6 +12,17 @@ import requests
 from src import set_molecule_type, set_polymer_type, set_tool
 
 def insert_path(valid_path):
+    """
+    Verifica il il percorso in input è corretto:
+    - cartella contenente file PDBx/mmCIF
+    - file di testo contenente PDB id separati da virgola
+
+    Args:
+        valid_path (str): percorso in input.
+    
+    Raises:
+        OSError: Se il percorso non rispetta i requisti.
+    """
     if os.path.isdir(valid_path):
         if all(f.endswith('.cif') for f in os.listdir(valid_path)):
             copy_folder(valid_path)
@@ -28,6 +39,15 @@ def insert_path(valid_path):
         raise OSError("Il percorso non è una cartella nè un file di testo")
 
 def copy_folder(source_path):
+    """
+    Copia il contenuto di una cartella sorgente nella cartella 'files_cif'.
+
+    Args:
+        source_path (str): Percorso della cartella sorgente contenente file mmCIF.
+
+    Raises:
+        shutil.Error: Se si verifica un errore durante la copia dei file.
+    """
     destination_path = "files_cif"
     if os.path.exists(destination_path):
         shutil.rmtree(destination_path)
@@ -39,6 +59,16 @@ def copy_folder(source_path):
         print(f"Errore durante la copia della cartella: {e}")
 
 def download_cif(source_path):
+    """
+    Scarica file mmCIF da RCSB PDB sulla base di PDB ID presenti nel file di testo.
+    I file `.cif` corrispondenti vengono scaricati nella cartella 'files_cif'.
+
+    Args:
+        source_path (str): Percorso al file `.txt` contenente i PDB ID.
+
+    Raises:
+        requests.exceptions.RequestException: Se si verifica un errore durante il download dei file.
+    """
     destination_path = "files_cif"
     if os.path.exists(destination_path):
         for file_name in os.listdir(destination_path):
@@ -66,9 +96,24 @@ def download_cif(source_path):
     print("--------------------------------------------------")
 
 def insert_family(family):
+    """
+    Imposta il tipo di molecola (famiglia) specificato.
+
+    Args:
+        family (str): Nome della famiglia molecolare da impostare.
+    """
     set_molecule_type(family)
 
 def insert_polymer(polymer):
+    """
+    Imposta il tipo di polimero in base all'argomento della pipeline.
+
+    Args:
+        polymer (str): Codice del tipo di polimero.
+
+    Raises:
+        ValueError: Se il codice non corrisponde a un tipo valido.
+    """
     polymers = {
         'c': "cyclic-pseudo-peptide",
         'o': "other",
@@ -84,6 +129,15 @@ def insert_polymer(polymer):
     set_polymer_type(polymers[polymer])
 
 def insert_tool(tool):
+    """
+    Imposta il tool da utilizzare per l'analisi strutturale.
+
+    Args:
+        tool (str): Codice del tool da utilizzare.
+
+    Raises:
+        ValueError: Se il codice non corrisponde a un tool valido.
+    """
     tools = {
         'f': "fr3d",
         'b': "barnaba",

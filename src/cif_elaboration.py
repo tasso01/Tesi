@@ -14,6 +14,15 @@ from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from src import get_molecule_type, get_polymer_type
 
 def extract_atoms_from_ids(file_cif, entity_ids):
+    """
+    Estrae e salva i record atomicida un file mmCIF corrispondenti a specifici ID.
+    Per ciascun `entity_id` specificato, la funzione crea un nuovo file `.cif` nella cartella
+    'files_cif_id'.
+
+    Args:
+        file_cif (str): Percorso al file mmCIF da cui estrarre i dati.
+        entity_ids (set[int]): Insieme di ID da cui estrarre i record atomici.
+    """
     output_folder = "files_cif_id"
     pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
     record = {entity_id: [] for entity_id in entity_ids}
@@ -35,6 +44,13 @@ def extract_atoms_from_ids(file_cif, entity_ids):
         print(f"ATOM di {pdb_id} per entity_id {entity_id} salvati in {output_file}")
 
 def extract_ids_from_molecule(mmcif_file, molecule):
+    """
+    Estrae gli ID delle entità da un file mmCIF in base al tipo di molecola specificato.
+
+    Args:
+        mmcif_file (str): Percorso al file mmCIF da elaborare.
+        molecule (str): Tipo di molecola da cercare.
+    """
     entity_ids = set()
     cif_dict = MMCIF2Dict(mmcif_file)
     entity_ids_list = cif_dict.get("_entity.id", [])
@@ -45,6 +61,13 @@ def extract_ids_from_molecule(mmcif_file, molecule):
     extract_atoms_from_ids(mmcif_file, entity_ids)
 
 def extract_ids_from_polymer(mmcif_file, polymer):
+    """
+    Estrae gli ID delle entità da un file mmCIF in base al tipo di polimero specificato.
+
+    Args:
+        mmcif_file (str): Percorso al file mmCIF da elaborare.
+        polymer (str): Tipo di polimero da cercare.
+    """
     entity_ids = set()
     cif_dict = MMCIF2Dict(mmcif_file)
     entity_ids_list = cif_dict.get("_entity_poly.entity_id", [])
@@ -55,6 +78,18 @@ def extract_ids_from_polymer(mmcif_file, polymer):
     extract_atoms_from_ids(mmcif_file, entity_ids)
 
 def process_all_cif_files():
+    """
+    Elabora tutti i file mmCIF nella cartella 'files_cif'
+    per estrarre identificatori molecolari o polimerici.
+    I risultati vengono salvati nella cartella 'files_cif_id'.
+
+    La funzione sceglie il metodo di estrazione in base all'argomento impostato nella pipeline:
+    - Se è stato specificato un tipo di polimero, usa `extract_ids_from_polymer`.
+    - Se è stato specificato un tipo di molecola, usa `extract_ids_from_molecule`.
+
+    Raises:
+        TypeError: Se non è stato specificato né un tipo di polimero né un tipo di molecola.
+    """
     cif_folder = "files_cif"
     destination_folder = "files_cif_id"
     if os.path.exists(destination_folder):
@@ -77,6 +112,9 @@ def process_all_cif_files():
     print("--------------------------------------------------")
 
 def move_pdb_files():
+    """
+    Docstring in `cif_pdb_converte()`
+    """
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     pdb_folder = 'files_pdb_id'
     if os.path.exists(pdb_folder):
@@ -94,6 +132,9 @@ def move_pdb_files():
     print("--------------------------------------------------")
 
 def delete_txt_files_from_main():
+    """
+    Docstring in `cif_pdb_converte()`
+    """
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     for file in os.listdir(root_dir):
         file_path = os.path.join(root_dir, file)
@@ -104,6 +145,18 @@ def delete_txt_files_from_main():
                 print(f"Errore durante l'eliminazione di {file}: {e}")
 
 def cif_pdb_converter():
+    """
+    Converte file mmCIF in formato PDB utilizzando il tool esterno BeEM.
+
+    Per ogni file `.cif` presente nella cartella `files_cif_id`, viene eseguito BeEM con
+    il nome del file come input. Dopo la conversione:
+    - i file PDB generati vengono spostati tramite `move_pdb_files()`
+    - eventuali file `.txt` superflui nella directory principale
+      vengono rimossi con `delete_txt_files_from_main()`
+    
+    Raises:
+        subprocess.CalledProcessError: Se il comando BeEM fallisce per uno dei file.
+    """
     beem_executable = "BeEM.exe"
     cif_folder = "files_cif_id"
     for cif_file in os.listdir(cif_folder):
@@ -112,23 +165,3 @@ def cif_pdb_converter():
         subprocess.run(command, shell=True, check=True)
     move_pdb_files()
     delete_txt_files_from_main()
-
-def extract_atoms_from_ids2(file_cif, entity_ids):
-    output_folder = "files_cif_id"
-    pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
-    cif_dict = MMCIF2Dict(file_cif)
-    group_pdb = cif_dict["_atom_site.group_PDB"]
-    label_entity_ids = list(map(int, cif_dict["_atom_site.label_entity_id"]))
-    atom_indices = {entity_id: [] for entity_id in entity_ids}
-    for i, (atom, entity_id) in enumerate(zip(group_pdb, label_entity_ids)):
-        if atom == "ATOM" and entity_id in entity_ids:
-            atom_indices[entity_id].append(i + 1)
-    with open(file_cif, encoding='utf-8') as mmCIF:
-        lines = mmCIF.readlines()
-    for entity_id, indices in atom_indices.items():
-        output_file = os.path.join(output_folder, f"{pdb_id}_{entity_id}.cif")
-        with open(output_file, "w", encoding='utf-8') as outfile:
-            for line in lines:
-                if line.startswith("_atom_site.") or (line.startswith("ATOM") and int(line.split()[1]) in indices):
-                    outfile.write(line)
-        print(f"ATOM di {pdb_id} per entity_id {entity_id} salvati in {output_file}")

@@ -18,6 +18,11 @@ import os
 from src import get_tool
 
 def convert_output():
+    """
+    In base al tool attualmente impostato (`fr3d`, `barnaba` o `rnaview`), la funzione richiama 
+    `bpseq_generator()` passando i parametri corretti per ciascun tipo di file e funzione 
+    di parsing delle interazioni tra basi.
+    """
     tool_to_run = get_tool()
     match tool_to_run:
         case "fr3d":
@@ -31,6 +36,16 @@ def convert_output():
             bpseq_generator("rnaview", ".pdb.out", base_pairs_rnaview)
 
 def canonical_base(a, b):
+    """
+    Verifica se due basi formano una coppia canonica.
+
+    Args:
+        a (str): Prima base.
+        b (str): Seconda base.
+
+    Returns:
+        bool: True se la coppia è canonica, False altrimenti.
+    """
     canonical_pairs = {
         ('C', 'G'), ('G', 'C'),
         ('A', 'U'), ('U', 'A'),
@@ -40,12 +55,33 @@ def canonical_base(a, b):
     return (a, b) in canonical_pairs
 
 def canonical_link(l):
+    """
+    Verifica se un tipo di interazione tra basi è canonico.
+
+    Args:
+        l (str): Tipo di legame.
+
+    Returns:
+        bool: True se il legame è canonico, False altrimenti.
+    """
     canonical_links = {
         "cWW", "WWc", "WCc", "W/W cis", "+/+ cis", "-/- cis"
     }
     return l in canonical_links
 
 def base_pairs_lines(base_pairs_list):
+    """
+    Converte una lista di coppie di basi in formato BPSEQ, includendo entrambi i versi della coppia.
+
+    L'output è una lista di righe che rappresenta ogni interazione
+    base-base in entrambe le direzioni.
+
+    Args:
+        base_pairs_list (list[str]): Lista di interazioni.
+
+    Returns:
+        list[str]: Lista con righe formattate per entrambe le direzioni.
+    """
     first_half = []
     for line in base_pairs_list:
         parts = line.split()
@@ -59,6 +95,17 @@ def base_pairs_lines(base_pairs_list):
     return first_half + second_half
 
 def base_pairs_rnaview(file_path):
+    """
+    Estrae le interazioni tra basi da un file di output generato da RNAView.
+
+    Args:
+        file_path (str): Percorso al file `.pdb.out` prodotto da RNAView.
+
+    Returns:
+        tuple: Due liste di stringhe, rispettivamente contenenti:
+            - interazioni canoniche in formato BPSEQ
+            - interazioni non canoniche in formato TXT
+    """
     extracted_lines = []
     inside_section = False
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -73,6 +120,18 @@ def base_pairs_rnaview(file_path):
     return base_pairs_lines_rnaview(extracted_lines)
 
 def base_pairs_lines_rnaview(base_pairs_list):
+    """
+    Classifica le coppie di basi estratte da RNAView in canoniche e non canoniche.
+    La classificazione avviene usando le funzioni `canonical_base()` e `canonical_link()`.
+
+    Args:
+        base_pairs_list (list[str]): Lista di righe rappresentanti interazioni base-base.
+
+    Returns:
+        tuple: Due liste di stringhe:
+            - interazioni canoniche
+            - interazioni non canoniche
+    """
     canonical = []
     non_canonical = []
     for line in base_pairs_list:
@@ -92,6 +151,20 @@ def base_pairs_lines_rnaview(base_pairs_list):
     return canonical_lines, non_canonical_lines
 
 def base_pairs_fr3d(file_path):
+    """
+    Estrae e classifica le interazioni tra basi da un file di output generato da FR3D.
+
+    Le coppie vengono classificate come canoniche o non canoniche usando
+    `canonical_base()` e `canonical_link()`.
+
+    Args:
+        file_path (str): Percorso al file `.txt` generato da FR3D.
+
+    Returns:
+        tuple: Due liste di stringhe:
+            - interazioni canoniche
+            - interazioni non canoniche
+    """
     canonical_lines = []
     non_canonical_lines = []
     with open(file_path, 'r', encoding='utf-8') as file:
@@ -108,6 +181,17 @@ def base_pairs_fr3d(file_path):
     return canonical_lines, non_canonical_lines
 
 def base_pairs_barnaba(file_path):
+    """
+    Estrae le interazioni tra basi da un file di output generato da Barnaba.
+
+    Args:
+        file_path (str): Percorso al file `.pairing.out` di Barnaba.
+
+    Returns:
+        tuple: Due liste di stringhe, rispettivamente contenenti:
+            - righe in formato BPSEQ delle interazioni canoniche
+            - righe in formato TXT delle interazioni non canoniche
+    """
     extracted_lines = []
     inside_section = False
     with open(file_path, 'r', encoding='utf-8') as f:
@@ -120,6 +204,18 @@ def base_pairs_barnaba(file_path):
     return base_pairs_lines_barnaba(extracted_lines)
 
 def base_pairs_lines_barnaba(base_pairs_list):
+    """
+    Classifica una lista di coppie di basi (formato Barnaba) in canoniche e non canoniche.
+    La classificazione avviene usando le funzioni `canonical_base()` e `canonical_link()`.
+
+    Args:
+        base_pairs_list (list[str]): Lista di righe con coppie di basi Barnaba.
+
+    Returns:
+        tuple: Due liste di stringhe:
+            - interazioni canoniche
+            - interazioni non canoniche
+    """
     canonical = []
     non_canonical = []
     for line in base_pairs_list:
@@ -136,6 +232,19 @@ def base_pairs_lines_barnaba(base_pairs_list):
     return canonical_lines, non_canonical_lines
 
 def bpseq_generator(tool, extension, function):
+    """
+    Genera file in formato BPSEQ e TXT a partire dagli output del tool specificato.
+
+    Per ogni file prodotto dal tool,
+    la funzione chiama la funzione di parsing per ottenere:
+       - interazioni canoniche (BPSEQ)
+       - interazioni non canoniche (TXT)
+
+    Args:
+        tool (str): Nome del tool.
+        extension (str): Estensione dei file di output del tool.
+        function (Callable): Funzione di parsing che restituisce 2 liste (canoniche, non canoniche).
+    """
     output_folder = f"output\\{tool}"
     bpseq_folder = f"output\\{tool}_bpseq"
     txt_folder = f"output\\{tool}_txt"

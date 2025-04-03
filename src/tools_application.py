@@ -12,6 +12,9 @@ import shutil
 from src import get_tool
 
 def run_tool():
+    """
+    Esegue il tool selezionato in base al valore impostato nella pipeline.
+    """
     tool_to_run = get_tool()
     match tool_to_run:
         case "fr3d":
@@ -22,6 +25,9 @@ def run_tool():
             rnaview()
 
 def remove_out_files_from_root():
+    """
+    Docstring in `rnaview()`
+    """
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     files = [f for f in os.listdir(root_dir) if os.path.isfile(os.path.join(root_dir, f))]
     for file in files:
@@ -33,6 +39,9 @@ def remove_out_files_from_root():
                 print(f"Errore nell'eliminazione di {file}: {e}")
 
 def remove_unused_rnaview():
+    """
+    Docstring in `rnaview()`
+    """
     folder_path = "files_pdb_id"
     files = os.listdir(folder_path)
     for file in files:
@@ -45,6 +54,9 @@ def remove_unused_rnaview():
                     print(f"Errore nell'eliminazione di {file}: {e}")
 
 def move_pdb_out_files():
+    """
+    Docstring in `rnaview()`
+    """
     source_folder = "files_pdb_id"
     destination_folder= "output\\rnaview"
     files = os.listdir(source_folder)
@@ -58,6 +70,13 @@ def move_pdb_out_files():
                 print(f"Errore nello spostamento di {file}: {e}")
 
 def rnaview():
+    """
+    Applica il tool RNAView a tutti i PDB presenti nella cartella `files_cid_id`
+    Elimina i file di output non necessari e li orgnaizza con:
+    - `remove_out_files_from_root()`
+    - `remove_unused_rnaview()`
+    - `move_pdb_out_files()`
+    """
     folder_path = "files_pdb_id"
     destination_folder= "output\\rnaview"
     if os.path.exists(destination_folder):
@@ -69,10 +88,7 @@ def rnaview():
     pdb_files = [f for f in os.listdir(folder_path)]
     for pdb_file in pdb_files:
         pdb_path = os.path.join(folder_path, pdb_file)
-        try:
-            subprocess.run(["rnaview", pdb_path], check=True)
-        except subprocess.CalledProcessError as e:
-            print(f"Errore nell'esecuzione di rnaview per {pdb_file}: {e}")
+        subprocess.run(["rnaview", pdb_path], check=True)
     remove_unused_rnaview()
     remove_out_files_from_root()
     move_pdb_out_files()
@@ -81,6 +97,9 @@ def rnaview():
     print("--------------------------------------------------")
 
 def clean_fr3d_output():
+    """
+    Docstring in `fr3d()`
+    """
     destination_folder = "output\\fr3d"
     for filename in os.listdir(destination_folder):
         if filename.endswith("_basepair.txt"):
@@ -90,6 +109,10 @@ def clean_fr3d_output():
             os.rename(old_path, new_path)
 
 def fr3d():
+    """
+    Applica il tool FR3D a tutti i PDB presenti nella cartella `files_cid_id`
+    Riscrive i nomi dei file di output con `clean_fr3d_output()`.
+    """
     destination_folder = "output\\fr3d"
     if os.path.exists(destination_folder):
         for file_name in os.listdir(destination_folder):
@@ -119,6 +142,9 @@ def fr3d():
     print("--------------------------------------------------")
 
 def move_barnaba_out(pdb_id):
+    """
+    Docstring in `barnaba()`
+    """
     root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
     target_dir = os.path.join(root_dir, "output\\barnaba")
     for filename in os.listdir(root_dir):
@@ -131,6 +157,10 @@ def move_barnaba_out(pdb_id):
             shutil.move(file_path, new_path)
 
 def barnaba():
+    """
+    Applica il tool Barnaba a tutti i PDB presenti nella cartella `files_cid_id`
+    Organizza gli output con `move_barnaba_out()`.
+    """
     destination_folder = "output\\barnaba"
     if os.path.exists(destination_folder):
         for file_name in os.listdir(destination_folder):
@@ -145,10 +175,7 @@ def barnaba():
             pdb_id = os.path.splitext(filename)[0]
             file_path = os.path.join(pdb_folder, filename)
             command = ["python", barnaba_script, "ANNOTATE", "--pdb", file_path]
-            try:
-                subprocess.run(command, check=True)
-            except subprocess.CalledProcessError as e:
-                print(f"Errore nell'esecuzione del comando per {filename}: {e}")
+            subprocess.run(command, check=True)
             move_barnaba_out(pdb_id)
     print("--------------------------------------------------")
     print(f"Cartella '{destination_folder}' con gli output creata.")
