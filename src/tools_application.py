@@ -1,3 +1,11 @@
+"""
+Modulo per l'esecuzione automatica degli strumenti esterni di analisi strutturale su file PDB.
+
+Funzionalità principali:
+- Avvia il tool selezionati in input
+- Gestisce l'esecuzione di ciascun tool su file presenti in `files_pdb_id`
+  e salva gli output nelle relative cartelle.
+"""
 import os
 import subprocess
 import shutil

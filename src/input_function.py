@@ -1,3 +1,11 @@
+"""
+Modulo per la gestione dell'importazione e della configurazione di file mmCIF.
+
+Funzionalità principali:
+- Importa file mmCIF da una cartella contenente solo file `.cif` oppure li scarica
+  a partire da un file `.txt` contenente iPDB id separati da virgole.
+- Imposta le variabili globali: molecola, polimero, software da utilizzare
+"""
 import shutil
 import os
 import requests

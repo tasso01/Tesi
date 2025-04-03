@@ -1,3 +1,8 @@
+"""
+Modulo per la gestione delle configurazioni globali dell'applicazione.
+Rende la cartella <src> un modulo Python, permettendo di importare
+le variabili globali in altri moduli della cartella.
+"""
 MOLECULE_TYPE = ""
 
 POLYMER_TYPE = ""

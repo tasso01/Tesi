@@ -1,3 +1,19 @@
+"""
+Modulo per la conversione degli output dei software di analisi.
+
+Funzionalità principali:
+- Identifica ed estrae le coppie di basi canoniche e non canoniche
+  dagli output generati da strumenti.
+- Converte i file di output specifici per ciascun tool nei formati:
+  - `bpseq` per le coppie canoniche
+  - `txt` per le coppie non canoniche
+
+Componenti principali:
+- Funzioni di parsing per ciascun tool:
+  `base_pairs_fr3d`, `base_pairs_barnaba`, `base_pairs_rnaview`
+- Funzione generica `bpseq_generator` che centralizza
+  il processo di conversione.
+"""
 import os
 from src import get_tool
 

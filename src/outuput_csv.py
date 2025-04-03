@@ -1,3 +1,7 @@
+"""
+Modulo per la raccolta dei risultati ottenuti da strumenti di analisi strutturale
+in un file CSV riepilogativo.
+"""
 import os
 import csv
 from Bio.PDB.MMCIF2Dict import MMCIF2Dict

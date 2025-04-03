@@ -1,3 +1,7 @@
+"""
+Questo modulo gestisce l'analisi degli argomenti da linea di comando
+utilizzando la libreria argparse.
+"""
 import argparse
 from src import input_function, cif_elaboration, tools_application, bpseq_conversion, outuput_csv
 

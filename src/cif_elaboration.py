@@ -1,3 +1,12 @@
+"""
+Modulo per l'estrazione e la conversione di file mmCIF basati su tipi di molecola o polimero.
+
+Funzionalità principali:
+- Estrae record atomici da file mmCIF in base agli `entity_id`
+  associati a una molecola o a un tipo di polimero specificato.
+- Converte i file mmCIF filtrati in formato PDB utilizzando un eseguibile esterno (BeEM.exe).
+- Utilizzo di `Bio.PDB.MMCIF2Dict` per la lettura e interpretazione dei file mmCIF.
+"""
 import os
 import shutil
 import subprocess
