@@ -72,6 +72,15 @@ def rnaview():
     print(f"Cartella '{destination_folder}' con gli output creata.")
     print("--------------------------------------------------")
 
+def clean_fr3d_output():
+    destination_folder = "output\\fr3d"
+    for filename in os.listdir(destination_folder):
+        if filename.endswith("_basepair.txt"):
+            new_filename = filename.replace("_basepair", "")
+            old_path = os.path.join(destination_folder, filename)
+            new_path = os.path.join(destination_folder, new_filename)
+            os.rename(old_path, new_path)
+
 def fr3d():
     destination_folder = "output\\fr3d"
     if os.path.exists(destination_folder):
@@ -96,9 +105,22 @@ def fr3d():
         ]
         subprocess.run(comando, check=True)
     os.chdir(root_dir)
+    clean_fr3d_output()
     print("--------------------------------------------------")
     print(f"Cartella '{destination_folder}' con gli output creata.")
     print("--------------------------------------------------")
+
+def move_barnaba_out(pdb_id):
+    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    target_dir = os.path.join(root_dir, "output\\barnaba")
+    for filename in os.listdir(root_dir):
+        file_path = os.path.join(root_dir, filename)
+        if filename.endswith(".stacking.out"):
+            os.remove(file_path)
+        elif filename.endswith(".pairing.out"):
+            new_name = f"{pdb_id}.pairing.out"
+            new_path = os.path.join(target_dir, new_name)
+            shutil.move(file_path, new_path)
 
 def barnaba():
     destination_folder = "output\\barnaba"
@@ -123,15 +145,3 @@ def barnaba():
     print("--------------------------------------------------")
     print(f"Cartella '{destination_folder}' con gli output creata.")
     print("--------------------------------------------------")
-
-def move_barnaba_out(pdb_id):
-    root_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-    target_dir = os.path.join(root_dir, "output\\barnaba")
-    for filename in os.listdir(root_dir):
-        file_path = os.path.join(root_dir, filename)
-        if filename.endswith(".stacking.out"):
-            os.remove(file_path)
-        elif filename.endswith(".pairing.out"):
-            new_name = f"{pdb_id}.pairing.out"
-            new_path = os.path.join(target_dir, new_name)
-            shutil.move(file_path, new_path)
