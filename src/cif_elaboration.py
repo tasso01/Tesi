@@ -8,8 +8,8 @@ def extract_atoms_from_ids(file_cif, entity_ids):
     output_folder = "files_cif_id"
     pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
     record = {entity_id: [] for entity_id in entity_ids}
-    with open(file_cif, encoding='utf-8') as mmCIF:
-        lines = mmCIF.readlines()
+    with open(file_cif, encoding='utf-8') as f:
+        lines = f.readlines()
     for line in lines:
         if line.startswith("_atom_site."):
             for key in record:
@@ -18,60 +18,53 @@ def extract_atoms_from_ids(file_cif, entity_ids):
             chain = int(line.split()[7])
             if chain in record:
                 record[chain].append(line)
-    for entity_id, atoms in record.items():
+    for entity_id, atoms_lines in record.items():
         output_file = os.path.join(output_folder, f"{pdb_id}_{entity_id}.cif")
         with open(output_file, "w", encoding='utf-8') as f:
-            for atom in atoms:
+            for atom in atoms_lines:
                 f.write(atom)
         print(f"ATOM di {pdb_id} per entity_id {entity_id} salvati in {output_file}")
 
 def extract_ids_from_molecule(mmcif_file, molecule):
     entity_ids = set()
-    mmcif_dict = MMCIF2Dict(mmcif_file)
-    entity_ids_list = mmcif_dict.get("_entity.id", [])
-    entity_types = mmcif_dict.get("_entity.pdbx_description", [])
-    for entity_id, entity_type in zip(entity_ids_list, entity_types):
-        if entity_type.strip() == molecule:
-            try:
-                entity_ids.add(int(entity_id))
-            except ValueError:
-                continue
+    cif_dict = MMCIF2Dict(mmcif_file)
+    entity_ids_list = cif_dict.get("_entity.id", [])
+    molecules_types = cif_dict.get("_entity.pdbx_description", [])
+    for entity_id, molecule_type in zip(entity_ids_list, molecules_types):
+        if molecule_type.strip() == molecule:
+            entity_ids.add(int(entity_id))
     extract_atoms_from_ids(mmcif_file, entity_ids)
 
 def extract_ids_from_polymer(mmcif_file, polymer):
     entity_ids = set()
-    mmcif_dict = MMCIF2Dict(mmcif_file)
-    entity_ids_list = mmcif_dict.get("_entity_poly.entity_id", [])
-    entity_types = mmcif_dict.get("_entity_poly.type", [])
-    for entity_id, entity_type in zip(entity_ids_list, entity_types):
-        if entity_type.strip() == polymer:
-            try:
-                entity_ids.add(int(entity_id))
-            except ValueError:
-                continue
+    cif_dict = MMCIF2Dict(mmcif_file)
+    entity_ids_list = cif_dict.get("_entity_poly.entity_id", [])
+    polymers_types = cif_dict.get("_entity_poly.type", [])
+    for entity_id, polymer_type in zip(entity_ids_list, polymers_types):
+        if polymer_type.strip() == polymer:
+            entity_ids.add(int(entity_id))
     extract_atoms_from_ids(mmcif_file, entity_ids)
 
 def process_all_cif_files():
-    cif_directory = "files_cif"
-    cif_files = [f for f in os.listdir(cif_directory)]
+    cif_folder = "files_cif"
     destination_folder = "files_cif_id"
     if os.path.exists(destination_folder):
-        for file_name in os.listdir(destination_folder):
-            file_path = os.path.join(destination_folder, file_name)
+        for f in os.listdir(destination_folder):
+            file_path = os.path.join(destination_folder, f)
             os.remove(file_path)
     else:
         os.makedirs(destination_folder)
     if get_polymer_type():
-        for cif_file in cif_files:
-            cif_path = os.path.join(cif_directory, cif_file)
+        for cif_file in os.listdir(cif_folder):
+            cif_path = os.path.join(cif_folder, cif_file)
             extract_ids_from_polymer(cif_path, get_polymer_type())
     elif get_molecule_type():
-        for cif_file in cif_files:
-            cif_path = os.path.join(cif_directory, cif_file)
+        for cif_file in os.listdir(cif_folder):
+            cif_path = os.path.join(cif_folder, cif_file)
             extract_ids_from_molecule(cif_path, get_molecule_type())
     else:
         raise TypeError("Polimero o Molecola mancante")
-    print(f"Molecole estratte da tutti i file mmCIF presenti nella cartella '{cif_directory}'")
+    print(f"Molecole estratte da tutti i file mmCIF presenti nella cartella '{cif_folder}'")
     print("--------------------------------------------------")
 
 def move_pdb_files():
@@ -102,12 +95,11 @@ def delete_txt_files_from_main():
                 print(f"Errore durante l'eliminazione di {file}: {e}")
 
 def cif_pdb_converter():
-    beem_executable_path = "BeEM.exe"
+    beem_executable = "BeEM.exe"
     cif_folder = "files_cif_id"
-    cif_files = [f for f in os.listdir(cif_folder)]
-    for cif_file in cif_files:
-        file_name_without_ext = os.path.splitext(cif_file)[0]
-        command = f'"{beem_executable_path}" -p={file_name_without_ext} {cif_folder}\\{cif_file}'
+    for cif_file in os.listdir(cif_folder):
+        pdb_id = os.path.splitext(cif_file)[0]
+        command = f'"{beem_executable}" -p={pdb_id} {cif_folder}\\{cif_file}'
         subprocess.run(command, shell=True, check=True)
     move_pdb_files()
     delete_txt_files_from_main()

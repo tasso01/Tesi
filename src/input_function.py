@@ -40,9 +40,9 @@ def download_cif(source_path):
         os.makedirs(destination_path)
     with open(source_path, "r", encoding='utf-8') as file:
         content = file.read().strip()
-    id_pdbs = content.split(",")
+    pdb_ids = content.split(",")
     base_url = "https://files.rcsb.org/download/{}.cif"
-    for pdb_id in id_pdbs:
+    for pdb_id in pdb_ids:
         pdb_id = pdb_id.strip()
         url = base_url.format(pdb_id)
         file_path = os.path.join(destination_path, f"{pdb_id}.cif")

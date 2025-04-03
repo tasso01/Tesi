@@ -1,7 +1,0 @@
-PDB_ID,POLYMER,MOLECULE,CHAIN,TOOL,CANONICAL_BASE_PAIRS,NON_CANONICAL_BASE_PAIRS
-1qvg,polyribonucleotide,5S ribosomal RNA,2,fr3d,output\fr3d_bpseq\1qvg_2.bpseq,output\fr3d_txt\1qvg_2.txt
-4u4q,polyribonucleotide,5S ribosomal RNA,37,fr3d,output\fr3d_bpseq\4u4q_37.bpseq,output\fr3d_txt\4u4q_37.txt
-4v9i,polyribonucleotide,5S ribosomal RNA,27,fr3d,output\fr3d_bpseq\4v9i_27-pdb-bundle1.bpseq,output\fr3d_txt\4v9i_27-pdb-bundle1.txt
-5fdv,polyribonucleotide,5S ribosomal RNA,2,fr3d,output\fr3d_bpseq\5fdv_2-pdb-bundle1.bpseq,output\fr3d_txt\5fdv_2-pdb-bundle1.txt
-6r6p,polyribonucleotide,5S ribosomal RNA,2,fr3d,output\fr3d_bpseq\6r6p_2.bpseq,output\fr3d_txt\6r6p_2.txt
-8cku,polyribonucleotide,5S ribosomal RNA,14,fr3d,output\fr3d_bpseq\8cku_14-pdb-bundle1.bpseq,output\fr3d_txt\8cku_14-pdb-bundle1.txt
