@@ -5,30 +5,24 @@ from Bio.PDB.MMCIF2Dict import MMCIF2Dict
 from src import get_molecule_type, get_polymer_type
 
 def extract_atoms_from_ids(file_cif, entity_ids):
-    cif_dict = MMCIF2Dict(file_cif)
-    for key in ["_atom_site.group_PDB", "_atom_site.label_entity_id"]:
-        if key not in cif_dict:
-            raise KeyError(f"Il file CIF non contiene la categoria {key}.")
-    group_pdb = cif_dict["_atom_site.group_PDB"]
-    label_entity_ids = list(map(int, cif_dict["_atom_site.label_entity_id"]))
-    entity_ids = set(entity_ids)
-    atom_indices = {eid: [] for eid in entity_ids}
-    for i, (g, eid) in enumerate(zip(group_pdb, label_entity_ids)):
-        if g == "ATOM" and eid in entity_ids:
-            atom_indices[eid].append(i + 1)
-    output_directory = "files_cif_id"
+    output_folder = "files_cif_id"
     pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
-    with open(file_cif, encoding='utf-8') as infile:
-        lines = infile.readlines()
-    for entity_id, indices in atom_indices.items():
-        if not indices:
-            print(f"Nessun ATOM trovato per entity_id '{entity_id}' in '{file_cif}'")
-            continue
-        output_file = os.path.join(output_directory, f"{pdb_id}_{entity_id}.cif")
-        with open(output_file, "w", encoding='utf-8') as outfile:
-            for line in lines:
-                if line.startswith("_atom_site.") or (line.startswith("ATOM") and int(line.split()[1]) in indices):
-                    outfile.write(line)
+    record = {entity_id: [] for entity_id in entity_ids}
+    with open(file_cif, encoding='utf-8') as mmCIF:
+        lines = mmCIF.readlines()
+    for line in lines:
+        if line.startswith("_atom_site."):
+            for key in record:
+                record[key].append(line)
+        if line.startswith("ATOM"):
+            chain = int(line.split()[7])
+            if chain in record:
+                record[chain].append(line)
+    for entity_id, atoms in record.items():
+        output_file = os.path.join(output_folder, f"{pdb_id}_{entity_id}.cif")
+        with open(output_file, "w", encoding='utf-8') as f:
+            for atom in atoms:
+                f.write(atom)
         print(f"ATOM di {pdb_id} per entity_id {entity_id} salvati in {output_file}")
 
 def extract_ids_from_molecule(mmcif_file, molecule):
@@ -119,27 +113,21 @@ def cif_pdb_converter():
     delete_txt_files_from_main()
 
 def extract_atoms_from_ids2(file_cif, entity_ids):
+    output_folder = "files_cif_id"
+    pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
     cif_dict = MMCIF2Dict(file_cif)
-    for key in ["_atom_site.group_PDB", "_atom_site.label_entity_id"]:
-        if key not in cif_dict:
-            raise KeyError(f"Il file CIF non contiene la categoria {key}.")
     group_pdb = cif_dict["_atom_site.group_PDB"]
     label_entity_ids = list(map(int, cif_dict["_atom_site.label_entity_id"]))
-    entity_ids = set(entity_ids)
-    atom_indices = set()
-    for i, (g, eid) in enumerate(zip(group_pdb, label_entity_ids)):
-        if g == "ATOM" and eid in entity_ids:
-            atom_indices.add(i + 1)
-    if not atom_indices:
-        print(f"Nessun ATOM trovato per gli entity_id forniti in '{file_cif}'")
-        return
-    output_directory = "files_cif_id"
-    pdb_id = os.path.splitext(os.path.basename(file_cif))[0]
-    output_file = os.path.join(output_directory, f"{pdb_id}_filtered.cif")
-    with open(file_cif, encoding='utf-8') as infile:
-        lines = infile.readlines()
-    with open(output_file, "w", encoding='utf-8') as outfile:
-        for line in lines:
-            if line.startswith("_atom_site.") or (line.startswith("ATOM") and int(line.split()[1]) in atom_indices):
-                outfile.write(line)
-    print(f"ATOM di {pdb_id} per gli entity_id {entity_ids} salvati in {output_file}")
+    atom_indices = {entity_id: [] for entity_id in entity_ids}
+    for i, (atom, entity_id) in enumerate(zip(group_pdb, label_entity_ids)):
+        if atom == "ATOM" and entity_id in entity_ids:
+            atom_indices[entity_id].append(i + 1)
+    with open(file_cif, encoding='utf-8') as mmCIF:
+        lines = mmCIF.readlines()
+    for entity_id, indices in atom_indices.items():
+        output_file = os.path.join(output_folder, f"{pdb_id}_{entity_id}.cif")
+        with open(output_file, "w", encoding='utf-8') as outfile:
+            for line in lines:
+                if line.startswith("_atom_site.") or (line.startswith("ATOM") and int(line.split()[1]) in indices):
+                    outfile.write(line)
+        print(f"ATOM di {pdb_id} per entity_id {entity_id} salvati in {output_file}")
